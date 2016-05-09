@@ -41,14 +41,13 @@ namespace VectorClock.Commander.ViewModel
             this.ipAddress = ipAddress;
         }
 
-        public async void CheckConnectivity()
+        public async Task CheckConnectivity()
         {
             using (var ping = new Ping())
             {
                 var reply = await ping.SendPingAsync(this.IpAddress);
                 this.IsConnected = reply.Status == IPStatus.Success;
             }
-            
         }
     }
 }
