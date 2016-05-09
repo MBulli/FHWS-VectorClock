@@ -22,7 +22,7 @@ namespace VectorClock.Common
 
         public class CommunicationBlock
         {
-            public VectorClock clock;
+            public VectorClockImpl clock;
             public CommunicationPayload payload;
 
         }
