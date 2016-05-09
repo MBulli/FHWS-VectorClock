@@ -59,6 +59,7 @@
     <Compile Include="Helper\NullToVisibilityConverter.cs" />
     <Compile Include="Helper\PropertyChangedBase.cs" />
     <Compile Include="Helper\RelayCommand.cs" />
+    <Compile Include="ViewModel\Converters\BooleanToBrushConverter.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\NodeViewModel.cs" />
     <Page Include="MainWindow.xaml">

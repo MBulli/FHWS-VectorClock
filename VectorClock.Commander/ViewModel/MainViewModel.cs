@@ -10,7 +10,7 @@ namespace VectorClock.Commander.ViewModel
 {
     public class MainViewModel : PropertyChangedBase
     {
-        private string title = "Hallo";
+        private string title = "VectorClock";
         public string Title
         {
             get { return title; } 
@@ -24,9 +24,9 @@ namespace VectorClock.Commander.ViewModel
 
         public MainViewModel()
         {
-            Node1 = new NodeViewModel("mjverteil01");
-            Node2 = new NodeViewModel("mjverteil02");
-            Node3 = new NodeViewModel("mjverteil03");
+            Node1 = new NodeViewModel("mjverteil01", System.Net.IPAddress.Parse("10.10.29.21"));
+            Node2 = new NodeViewModel("mjverteil02", System.Net.IPAddress.Parse("10.10.29.142"));
+            Node3 = new NodeViewModel("mjverteil03", System.Net.IPAddress.Parse("10.10.29.67"));
         }
 
     }

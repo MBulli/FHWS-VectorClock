@@ -8,7 +8,7 @@ using System.Windows.Data;
 namespace VectorClock.Commander.Helper
 {
     [System.Windows.Markup.MarkupExtensionReturnType(typeof(ConverterBase))]
-    abstract class ConverterBase : System.Windows.Markup.MarkupExtension, IValueConverter
+    public abstract class ConverterBase : System.Windows.Markup.MarkupExtension, IValueConverter
     {
         public ConverterBase()
         {
