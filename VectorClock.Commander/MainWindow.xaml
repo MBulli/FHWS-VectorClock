@@ -3,11 +3,24 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:v ="clr-namespace:VectorClock.Commander"
+        xmlns:vm="clr-namespace:VectorClock.Commander.ViewModel"
         xmlns:local="clr-namespace:VectorClock.Commander"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="{Binding Title}" Height="350" Width="525"
+        >
+    <Window.DataContext>
+        <vm:MainViewModel />
+    </Window.DataContext>
     <Grid>
-        <Button x:Name="button" Content="Button" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="75" Click="button_Click"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
+        <v:NodeInfoControl Grid.Column="0" DataContext="{Binding Node1}" />
+        <v:NodeInfoControl Grid.Column="1" DataContext="{Binding Node2}" />
+        <v:NodeInfoControl Grid.Column="2" DataContext="{Binding Node3}" />
     </Grid>
 </Window>

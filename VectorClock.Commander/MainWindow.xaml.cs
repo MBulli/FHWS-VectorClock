@@ -35,8 +35,8 @@ namespace VectorClock.Commander
             {
                 Message msg = MessageFactory.Control.Shutdown();
                 byte[] data = MessageSerializer.Serialze(msg);
-
-                IPEndPoint endPoint = new IPEndPoint(IPAddress.Loopback, 1337);
+                
+                IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse("10.31.52.46"), 1337);
                 client.Send(data, data.Length, endPoint);
             }
         }
