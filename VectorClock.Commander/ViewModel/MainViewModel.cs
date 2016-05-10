@@ -26,11 +26,15 @@ namespace VectorClock.Commander.ViewModel
         public NodeViewModel Node2 { get; set; }
         public NodeViewModel Node3 { get; set; }
 
+        //public NodeViewModel NodeLokal { get; set; }
+
         public MainViewModel()
         {
             Node1 = new NodeViewModel("mjverteil01", System.Net.IPAddress.Parse("10.10.29.21"));
             Node2 = new NodeViewModel("mjverteil02", System.Net.IPAddress.Parse("10.10.29.142"));
             Node3 = new NodeViewModel("mjverteil03", System.Net.IPAddress.Parse("10.10.29.67"));
+
+            //NodeLokal = new NodeViewModel("lokal", System.Net.IPAddress.Loopback);
 
             CheckNodeConnectivities(); //TODO: Timer
         }
@@ -46,6 +50,7 @@ namespace VectorClock.Commander.ViewModel
         {
             Task.Run(async () => await node.sendMessage(msg, node.IpAddress));
         }
+
         private RelayCommand startCommand;
         public RelayCommand StartCommand
         {
@@ -64,6 +69,8 @@ namespace VectorClock.Commander.ViewModel
                         SendMessageAsync(Node1, msg);
                         SendMessageAsync(Node2, msg);
                         SendMessageAsync(Node3, msg);
+
+                        //SendMessageAsync(NodeLokal, msg);
                     });
                 }
                 return startCommand;
