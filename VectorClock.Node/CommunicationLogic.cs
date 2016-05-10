@@ -22,7 +22,7 @@ namespace VectorClock.Node
 
         public void IncreaseVectorClock()
         {
-            clock.Increment(index);
+            clock.Increment();
         }
 
         public void UpdateClock(VectorClockImpl newerClock)

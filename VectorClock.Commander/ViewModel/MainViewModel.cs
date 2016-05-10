@@ -33,15 +33,6 @@ namespace VectorClock.Commander.ViewModel
             Node3 = new NodeViewModel("mjverteil03", System.Net.IPAddress.Parse("10.10.29.67"));
 
             CheckNodeConnectivities(); //TODO: Timer
-
-            Message msg = new Message();
-
-            msg.controlBlock.Command = ControlCommand.Shutdown;
-            msg.communicationBlock.payload.balance = 10;
-
-            SendMessageAsync(Node1, msg);
-            SendMessageAsync(Node2, msg);
-            SendMessageAsync(Node3, msg);
         }
 
         public void CheckNodeConnectivities()
@@ -54,6 +45,28 @@ namespace VectorClock.Commander.ViewModel
         public void SendMessageAsync(NodeViewModel node, Message msg)
         {
             Task.Run(async () => await node.sendMessage(msg, node.IpAddress));
+        }
+        private RelayCommand startCommand;
+        public RelayCommand StartCommand
+        {
+            get
+            {
+                if(startCommand == null)
+                {
+                    startCommand = new RelayCommand(() =>
+                    {
+                        Message msg = new Message();
+
+                        msg.controlBlock.Command = ControlCommand.Shutdown;
+                        msg.communicationBlock.payload.balance = 10;
+
+                        SendMessageAsync(Node1, msg);
+                        SendMessageAsync(Node2, msg);
+                        SendMessageAsync(Node3, msg);
+                    });
+                }
+                return startCommand;
+            }
         }
 
     }
