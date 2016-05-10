@@ -24,7 +24,6 @@ namespace VectorClock.Common
         {
             public VectorClockImpl clock;
             public CommunicationPayload payload;
-
         }
         
         public class CommunicationPayload

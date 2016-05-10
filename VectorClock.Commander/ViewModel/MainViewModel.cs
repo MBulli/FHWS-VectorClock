@@ -56,9 +56,10 @@ namespace VectorClock.Commander.ViewModel
                     startCommand = new RelayCommand(() =>
                     {
                         Message msg = new Message();
+                        msg.controlBlock = new Message.ControlBlock();
 
                         msg.controlBlock.Command = ControlCommand.Shutdown;
-                        msg.communicationBlock.payload.balance = 10;
+                        //msg.communicationBlock.payload.balance = 10;
 
                         SendMessageAsync(Node1, msg);
                         SendMessageAsync(Node2, msg);
