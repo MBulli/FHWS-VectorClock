@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using VectorClock.Commander.Helper;
+using VectorClock.Common;
 
 namespace VectorClock.Commander.ViewModel
 {
@@ -32,7 +34,14 @@ namespace VectorClock.Commander.ViewModel
 
             CheckNodeConnectivities(); //TODO: Timer
 
+            Message msg = new Message();
 
+            msg.controlBlock.Command = ControlCommand.Shutdown;
+            msg.communicationBlock.payload.balance = 10;
+
+            SendMessageAsync(Node1, msg);
+            SendMessageAsync(Node2, msg);
+            SendMessageAsync(Node3, msg);
         }
 
         public void CheckNodeConnectivities()
@@ -40,6 +49,11 @@ namespace VectorClock.Commander.ViewModel
             Task.Run(async () => await Node1.CheckConnectivity());
             Task.Run(async () => await Node2.CheckConnectivity());
             Task.Run(async () => await Node3.CheckConnectivity());
+        }
+
+        public void SendMessageAsync(NodeViewModel node, Message msg)
+        {
+            Task.Run(async () => await node.sendMessage(msg, node.IpAddress));
         }
 
     }

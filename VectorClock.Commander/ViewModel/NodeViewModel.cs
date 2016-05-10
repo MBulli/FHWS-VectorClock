@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
 using VectorClock.Commander.Helper;
+using VectorClock.Common;
 
 namespace VectorClock.Commander.ViewModel
 {
@@ -47,6 +49,16 @@ namespace VectorClock.Commander.ViewModel
             {
                 var reply = await ping.SendPingAsync(this.IpAddress);
                 this.IsConnected = reply.Status == IPStatus.Success;
+            }
+        }
+
+        public async Task sendMessage(Message msg, IPAddress destination)
+        {
+            using (UdpClient client = new UdpClient(1337))
+            {
+                client.Connect(destination, 1337);
+                byte[] data = MessageSerializer.Serialze(msg);
+                client.Send(data, data.Length);
             }
         }
     }

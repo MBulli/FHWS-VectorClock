@@ -42,6 +42,9 @@ namespace VectorClock.Common
 
     public enum ControlCommand
     {
-        Shutdown
+        Shutdown,
+        IncreaseBalance,
+        DecreaseBalance,
+        Echo
     }
 }

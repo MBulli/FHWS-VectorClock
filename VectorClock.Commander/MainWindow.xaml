@@ -22,5 +22,7 @@
         <v:NodeInfoControl Grid.Column="0" DataContext="{Binding Node1}" />
         <v:NodeInfoControl Grid.Column="1" DataContext="{Binding Node2}" />
         <v:NodeInfoControl Grid.Column="2" DataContext="{Binding Node3}" />
+        <Button x:Name="button" Content="Button" HorizontalAlignment="Left" Margin="52,268,0,0" VerticalAlignment="Top" Width="74" Grid.Column="1"
+                Click="start"/>
     </Grid>
 </Window>

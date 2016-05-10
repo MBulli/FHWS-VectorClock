@@ -9,28 +9,28 @@ namespace VectorClock.Common
 {
     public class VectorClockImpl
     {
-        IPAddress ownerAddress;
-        Dictionary<IPAddress, int> timestamps;
+        int id = -1;
+        int[] timestamps;
 
-        public VectorClockImpl(IPAddress ownerAddress)
+        public VectorClockImpl(int ownerIndex)
         {
-            this.timestamps = new Dictionary<IPAddress, int>();
-            this.ownerAddress = ownerAddress;
+            this.timestamps = new int[3];
+            this.id = ownerIndex;
         }
 
-        public int Length { get { return timestamps.Count; } }
-        public int this[IPAddress index]
+        public int Length { get { return timestamps.Length; } }
+        public int this[int index]
         {
             get { return timestamps[index]; }
             set { timestamps[index] = value; }
         }
 
-        public void Increment(IPAddress index)
+        public void Increment()
         {
-            timestamps[index]++;
+            timestamps[this.id]++;
         }
 
-        public void Set(IPAddress index, int value)
+        public void Set(int index, int value)
         {
             timestamps[index] = value;
         }
@@ -48,11 +48,11 @@ namespace VectorClock.Common
             throw new NotImplementedException();
         }
 
-        private bool AllElementsLessThanOrEqual(Dictionary<IPAddress, int> a, Dictionary<IPAddress, int> b)
+        private bool AllElementsLessThanOrEqual(int[] a, int[] b)
         {
-            for (int k = 0; k < a.Count; k++)
+            for (int k = 0; k < a.Length; k++)
             {
-                if (!(a.ElementAt(k).Value <= b.ElementAt(k).Value))
+                if (!(a[k] <= b[k]))
                 {
                     return false;
                 }
@@ -61,11 +61,11 @@ namespace VectorClock.Common
             return true;
         }
 
-        private bool AnyElementLessThan(Dictionary<IPAddress, int> a, Dictionary<IPAddress, int> b)
+        private bool AnyElementLessThan(int[] a, int[] b)
         {
-            for (int k = 0; k < a.Count; k++)
+            for (int k = 0; k < a.Length; k++)
             {
-                if (a.ElementAt(k).Value < b.ElementAt(k).Value)
+                if (a[k] < b[k])
                 {
                     return true;
                 }
