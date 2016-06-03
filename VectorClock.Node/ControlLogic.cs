@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using VectorClock.Common;
@@ -17,8 +18,10 @@ namespace VectorClock.Node
             this.commLogic = commLogic;
         }
 
-        public bool HandleMessage(Message msg)
+        public bool HandleMessage(Message msg, IPEndPoint remoteEP)
         {
+            AnswerHost(msg);
+
             if (msg.controlBlock.Command == ControlCommand.Shutdown)
             {
                 Console.WriteLine("Shutdown command received!");
@@ -49,6 +52,18 @@ namespace VectorClock.Node
                 return false;
             }
         }
-        
+
+        private void AnswerHost(Message msg)
+        {
+            using (UdpClient client = new UdpClient())
+            {
+                client.Connect(IPAddress.Loopback, 1340);
+
+                byte[] data = MessageSerializer.Serialze(msg);
+                client.Send(data, data.Length);
+
+                Console.WriteLine("Answer sent to " + IPAddress.Loopback + ":" + 1340);
+            }
+        }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -20,7 +21,6 @@ namespace VectorClock.Commander.ViewModel
             get { return title; } 
             set { title = value; OnNotifyPropertyChanged(); }
         }
-
 
         public NodeViewModel Node1 { get; set; }
         public NodeViewModel Node2 { get; set; }
@@ -42,6 +42,28 @@ namespace VectorClock.Commander.ViewModel
             //NodeLokal = new NodeViewModel("lokal", System.Net.IPAddress.Loopback);
 
             CheckNodeConnectivities(); //TODO: Timer
+
+            Task listenToNodeTask = new Task(async () => await ListenToNode());
+            listenToNodeTask.Start();
+        }
+
+        public async Task ListenToNode()
+        {
+            using (UdpClient client = new UdpClient(1340, AddressFamily.InterNetwork))
+            {
+                while (true)
+                {
+                    if (client.Available > 0) // Only read if we have some data 
+                    {
+                        IPEndPoint remoteEP = null;
+                        byte[] data = client.Receive(ref remoteEP);
+
+                        Message msg = MessageDeserializer.Deserialize(data);
+                        Console.WriteLine("Message received from: " + remoteEP.Address + ":" + remoteEP.Port);
+                        Console.WriteLine(msg.controlBlock.Command);
+                    }
+                }
+            }
         }
 
         public void CheckNodeConnectivities()
@@ -57,7 +79,7 @@ namespace VectorClock.Commander.ViewModel
         }
 
         private RelayCommand startCommand;
-        public RelayCommand StartCommand
+        public RelayCommand StartCommand //buttonclick
         {
             get
             {

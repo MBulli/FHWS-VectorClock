@@ -56,7 +56,8 @@ namespace VectorClock.Commander.ViewModel
         {
             using (UdpClient client = new UdpClient())
             {
-                client.Connect(destination, port);
+                IPEndPoint endPoint = new IPEndPoint(destination, port);
+                client.Connect(endPoint);
                 byte[] data = MessageSerializer.Serialze(msg);
                 client.Send(data, data.Length);
             }
