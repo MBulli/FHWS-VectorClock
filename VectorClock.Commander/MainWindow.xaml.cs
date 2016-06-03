@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -27,18 +28,6 @@ namespace VectorClock.Commander
         public MainWindow()
         {
             InitializeComponent();
-        }
-
-        private void button_Click(object sender, RoutedEventArgs e)
-        {
-            using (UdpClient client = new UdpClient())
-            {
-                Message msg = MessageFactory.Control.Shutdown();
-                byte[] data = MessageSerializer.Serialze(msg);
-                
-                IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse("10.31.52.46"), 1337);
-                client.Send(data, data.Length, endPoint);
-            }
         }
     }
 }

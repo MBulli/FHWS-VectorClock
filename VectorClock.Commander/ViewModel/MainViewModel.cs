@@ -22,6 +22,14 @@ namespace VectorClock.Commander.ViewModel
             set { title = value; OnNotifyPropertyChanged(); }
         }
 
+        private string textBoxContent = "";
+        public string TextBoxContent
+        {
+            get { return textBoxContent; }
+            set { textBoxContent = value; OnNotifyPropertyChanged(); }
+        }
+
+
         public NodeViewModel Node1 { get; set; }
         public NodeViewModel Node2 { get; set; }
         public NodeViewModel Node3 { get; set; }
@@ -61,6 +69,7 @@ namespace VectorClock.Commander.ViewModel
                         Message msg = MessageDeserializer.Deserialize(data);
                         Console.WriteLine("Message received from: " + remoteEP.Address + ":" + remoteEP.Port);
                         Console.WriteLine(msg.controlBlock.Command);
+                        TextBoxContent += "Answer from: " + remoteEP.Address + ":" + remoteEP.Port + ". Message: " + msg.controlBlock.Command + "\n";
                     }
                 }
             }
