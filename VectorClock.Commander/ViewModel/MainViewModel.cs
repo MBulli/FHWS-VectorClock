@@ -30,9 +30,14 @@ namespace VectorClock.Commander.ViewModel
 
         public MainViewModel()
         {
-            Node1 = new NodeViewModel("mjverteil01", System.Net.IPAddress.Parse("10.10.29.21"));
-            Node2 = new NodeViewModel("mjverteil02", System.Net.IPAddress.Parse("10.10.29.142"));
-            Node3 = new NodeViewModel("mjverteil03", System.Net.IPAddress.Parse("10.10.29.67"));
+            //Node1 = new NodeViewModel("mjverteil01", System.Net.IPAddress.Parse("10.10.29.21"));
+            //Node2 = new NodeViewModel("mjverteil02", System.Net.IPAddress.Parse("10.10.29.142"));
+            //Node3 = new NodeViewModel("mjverteil03", System.Net.IPAddress.Parse("10.10.29.67"));
+
+            // this is for one-machine testing only
+            Node1 = new NodeViewModel("mjverteil01", IPAddress.Loopback);
+            Node2 = new NodeViewModel("mjverteil02", IPAddress.Loopback);
+            Node3 = new NodeViewModel("mjverteil03", IPAddress.Loopback);
 
             //NodeLokal = new NodeViewModel("lokal", System.Net.IPAddress.Loopback);
 
@@ -46,9 +51,9 @@ namespace VectorClock.Commander.ViewModel
             Task.Run(async () => await Node3.CheckConnectivity());
         }
 
-        public void SendMessageAsync(NodeViewModel node, Message msg)
+        public void SendMessageAsync(NodeViewModel node, Message msg, int port)
         {
-            Task.Run(async () => await node.sendMessage(msg, node.IpAddress));
+            Task.Run(async () => await node.sendMessage(msg, node.IpAddress, port));
         }
 
         private RelayCommand startCommand;
@@ -66,11 +71,9 @@ namespace VectorClock.Commander.ViewModel
                         msg.controlBlock.Command = ControlCommand.Shutdown;
                         //msg.communicationBlock.payload.balance = 10;
 
-                        SendMessageAsync(Node1, msg);
-                        SendMessageAsync(Node2, msg);
-                        SendMessageAsync(Node3, msg);
-
-                        //SendMessageAsync(NodeLokal, msg);
+                        SendMessageAsync(Node1, msg, 1337);
+                        SendMessageAsync(Node2, msg, 1338);
+                        SendMessageAsync(Node3, msg, 1339);
                     });
                 }
                 return startCommand;
