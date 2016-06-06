@@ -54,7 +54,7 @@ namespace VectorClock.Node
             ControlLogic controlLogic = new ControlLogic(commLogic);
 
             Console.WriteLine("Node with Id " + hostID + " and IP-address " + Dns.GetHostName().ToString() + " startet properly.");
-            Console.WriteLine("Listening to TCP-Port: " + port);
+            Console.WriteLine("Listening to UDP-Port: " + port);
 
             using (UdpClient client = new UdpClient(port, AddressFamily.InterNetwork))
             {
