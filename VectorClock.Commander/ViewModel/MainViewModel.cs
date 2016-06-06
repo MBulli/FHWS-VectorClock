@@ -67,9 +67,7 @@ namespace VectorClock.Commander.ViewModel
                         byte[] data = client.Receive(ref remoteEP);
 
                         Message msg = MessageDeserializer.Deserialize(data);
-                        Console.WriteLine("Message received from: " + remoteEP.Address + ":" + remoteEP.Port);
-                        Console.WriteLine(msg.controlBlock.Command);
-                        TextBoxContent += "Answer from: " + remoteEP.Address + ":" + remoteEP.Port + ". Message: " + msg.controlBlock.Command + "\n";
+                        TextBoxContent += $"Answer from: { remoteEP.Address}:{remoteEP.Port}. Message: {msg.controlBlock.Command} \n Clock: {msg.communicationBlock.clock}\n" ;
                     }
                 }
             }

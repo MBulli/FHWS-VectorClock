@@ -10,7 +10,7 @@ namespace VectorClock.Node
 {
     class CommunicationLogic
     {
-        private readonly VectorClockImpl clock;
+        public readonly VectorClockImpl clock;
 
         public readonly ApplicationLogic appLogic;
 
@@ -31,11 +31,6 @@ namespace VectorClock.Node
             {
                 this.clock.Set(i, newerClock[i]);
             }
-        }
-
-        public string ClockToString()
-        {
-            return "(" + clock[0] + "|" + clock[1] + "|" + clock[2] + ")";
         }
     }
 }

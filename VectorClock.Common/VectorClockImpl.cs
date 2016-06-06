@@ -25,6 +25,11 @@ namespace VectorClock.Common
             set { timestamps[index] = value; }
         }
 
+        public int getID()
+        {
+            return this.id;
+        }
+
         public void Increment()
         {
             timestamps[this.id]++;
@@ -76,7 +81,7 @@ namespace VectorClock.Common
 
         public override string ToString()
         {
-            return $"[{string.Join(",", timestamps)}]";
+            return $"ID= {id}: [{string.Join(",", timestamps)}]";
         }
     }
 

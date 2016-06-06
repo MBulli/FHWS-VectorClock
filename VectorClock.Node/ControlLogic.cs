@@ -20,6 +20,8 @@ namespace VectorClock.Node
 
         public bool HandleMessage(Message msg, IPEndPoint remoteEP)
         {
+            msg.communicationBlock = new Message.CommunicationBlock(); // CommBlock from commander-message was empty
+            msg.communicationBlock.clock = this.commLogic.clock;
             AnswerHost(msg);
 
             if (msg.controlBlock.Command == ControlCommand.Shutdown)
@@ -62,7 +64,7 @@ namespace VectorClock.Node
                 byte[] data = MessageSerializer.Serialze(msg);
                 client.Send(data, data.Length);
 
-                Console.WriteLine("Answer sent to " + IPAddress.Loopback + ":" + 1340);
+                Console.WriteLine($"Answer sent to {IPAddress.Loopback}:1340");
             }
         }
     }

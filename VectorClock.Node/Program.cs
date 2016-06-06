@@ -35,10 +35,6 @@ namespace VectorClock.Node
 
             //Console.WriteLine("Node with Id " + hostID + " and IP-address " + Dns.GetHostName().ToString() + " startet properly.");
 
-            ApplicationLogic appLogic = new ApplicationLogic();
-            CommunicationLogic commLogic = new CommunicationLogic(appLogic, hostID);
-            ControlLogic controlLogic = new ControlLogic(commLogic);
-
             // for one-machine testing only
             switch (port)
             {
@@ -52,6 +48,10 @@ namespace VectorClock.Node
                     hostID = 2;
                     break;
             }
+
+            ApplicationLogic appLogic = new ApplicationLogic();
+            CommunicationLogic commLogic = new CommunicationLogic(appLogic, hostID);
+            ControlLogic controlLogic = new ControlLogic(commLogic);
 
             Console.WriteLine("Node with Id " + hostID + " and IP-address " + Dns.GetHostName().ToString() + " startet properly.");
             Console.WriteLine("Listening to TCP-Port: " + port);

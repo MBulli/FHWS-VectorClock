@@ -16,13 +16,30 @@ namespace VectorClock.Common
             {
                 writer.Write((int)msg.type);
 
-                if (msg.type == MessageType.ControlCommand)
+                //if (msg.type == MessageType.ControlCommand)
+                //{
+                //    WriteControlBlock(writer, msg.controlBlock);
+                //}
+                //else
+                //{
+                //    WriteCommunicationBlock(writer, msg.communicationBlock);
+                //}
+
+
+                if (msg.controlBlock != null)
                 {
                     WriteControlBlock(writer, msg.controlBlock);
+                } else
+                {
+                    WriteControlBlock(writer, new Message.ControlBlock());
                 }
-                else
+
+                if (msg.communicationBlock != null)
                 {
                     WriteCommunicationBlock(writer, msg.communicationBlock);
+                } else
+                {
+                    WriteCommunicationBlock(writer, new Message.CommunicationBlock());
                 }
 
                 return memStream.GetBuffer();
@@ -36,7 +53,25 @@ namespace VectorClock.Common
 
         private static void WriteCommunicationBlock(BinaryWriter writer, Message.CommunicationBlock block)
         {
+            if(block.payload == null)
+            {
+                block.payload = new Message.CommunicationPayload();
+            }
+            writer.Write((int)block.payload.balance);   // write payload
 
+            if(block.clock == null)
+            {
+                block.clock = new VectorClockImpl(-1);
+            }
+            SerializeClock(writer, block.clock);        // write clock
+        }
+
+        private static void SerializeClock(BinaryWriter writer, VectorClockImpl clock)
+        {
+            writer.Write((int)clock.getID());
+            writer.Write((int)clock[0]);
+            writer.Write((int)clock[1]);
+            writer.Write((int)clock[2]);
         }
     }
 }

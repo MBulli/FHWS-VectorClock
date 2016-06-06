@@ -17,14 +17,18 @@ namespace VectorClock.Common
                 Message msg = new Message();
                 msg.type = (MessageType)reader.ReadInt32();
 
-                if (msg.type == MessageType.ControlCommand)
-                {
-                    msg.controlBlock = ReadControlBlock(reader);
-                }
-                else
-                {
-                    msg.communicationBlock = ReadCommunicationBlock(reader);
-                }
+                //if (msg.type == MessageType.ControlCommand)
+                //{
+                //    msg.controlBlock = ReadControlBlock(reader);
+                //}
+                //else
+                //{
+                //    msg.communicationBlock = ReadCommunicationBlock(reader);
+                //}
+
+                msg.controlBlock = ReadControlBlock(reader);
+                msg.communicationBlock = ReadCommunicationBlock(reader);
+                
 
                 return msg;
             }          
@@ -42,7 +46,21 @@ namespace VectorClock.Common
 
         public static Message.CommunicationBlock ReadCommunicationBlock(BinaryReader reader)
         {
-            throw new NotImplementedException();
+            int balance = (int)reader.ReadInt32();
+
+            Message.CommunicationBlock block = new Message.CommunicationBlock();
+            block.payload = new Message.CommunicationPayload();
+            block.payload.balance = balance;
+
+            VectorClockImpl clock = new VectorClockImpl((int)reader.ReadInt32());
+
+            clock[0] = (int)reader.ReadInt32();
+            clock[0] = (int)reader.ReadInt32();
+            clock[0] = (int)reader.ReadInt32();
+
+            block.clock = clock;
+
+            return block;
         }
     }
 }
