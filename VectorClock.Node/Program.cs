@@ -14,47 +14,33 @@ namespace VectorClock.Node
     {
         static void Main(string[] args)
         {
-            int hostID = -1;
-            int port = 1337;
-
-            Console.Write("Insert port to listen to: ");
-            port = Convert.ToInt32(Console.ReadLine());
-
-            //switch (Dns.GetHostName().ToString())
-            //{
-            //    case "10.10.29.21":
-            //        hostID = 0;
-            //        break;
-            //    case "10.10.29.142":
-            //        hostID = 1;
-            //        break;
-            //    case "10.10.29.67":
-            //        hostID = 2;
-            //        break;
-            //}
-
-            //Console.WriteLine("Node with Id " + hostID + " and IP-address " + Dns.GetHostName().ToString() + " startet properly.");
-
-            // for one-machine testing only
-            switch (port)
+            if (args.Length != 2)
             {
-                case 1337:
-                    hostID = 0;
-                    break;
-                case 1338:
-                    hostID = 1;
-                    break;
-                case 1339:
-                    hostID = 2;
-                    break;
+                Console.WriteLine("Invalid parameter.\nUsage: {0} <hostID> <port>",
+                        System.IO.Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().Location));
+                return;
+            }
+
+            int hostID = 0;
+            int port = 0;
+
+            if (!int.TryParse(args[0], out hostID))
+            {
+                Console.WriteLine("FATAL: Failed to parse hostID commandline parameter.");
+                return;
+            }
+            if (!int.TryParse(args[1], out port))
+            {
+                Console.WriteLine("FATAL: Failed to parse port commandline parameter.");
+                return;
             }
 
             ApplicationLogic appLogic = new ApplicationLogic();
             CommunicationLogic commLogic = new CommunicationLogic(appLogic, hostID);
             ControlLogic controlLogic = new ControlLogic(commLogic);
 
-            Console.WriteLine("Node with Id " + hostID + " and IP-address " + Dns.GetHostName().ToString() + " startet properly.");
-            Console.WriteLine("Listening to UDP-Port: " + port);
+            Console.WriteLine($"Node with Id {hostID} and IP-address {Dns.GetHostName().ToString()} started properly.");
+            Console.WriteLine($"Listening to UDP-Port: {port}");
 
             using (UdpClient client = new UdpClient(port, AddressFamily.InterNetwork))
             {
