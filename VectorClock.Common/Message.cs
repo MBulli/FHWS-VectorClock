@@ -12,8 +12,21 @@ namespace VectorClock.Common
         public MessageType type;
         public IPAddress senderAddress;
 
-        public ControlBlock controlBlock; // Null if type != ControlCommand       
-        public CommunicationBlock communicationBlock; // Null if type != Communication
+        public ControlBlock controlBlock;       
+        public CommunicationBlock communicationBlock; 
+
+
+        public Message()
+        {
+            type = new MessageType();
+            senderAddress = IPAddress.Any;
+
+            controlBlock = new ControlBlock();
+            controlBlock.Command = new ControlCommand();
+            communicationBlock = new CommunicationBlock();
+            communicationBlock.clock = new VectorClockImpl(-1);
+            communicationBlock.payload = new CommunicationPayload();
+        }
 
         public class ControlBlock
         {

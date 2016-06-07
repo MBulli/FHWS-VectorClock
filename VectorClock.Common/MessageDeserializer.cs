@@ -17,15 +17,6 @@ namespace VectorClock.Common
                 Message msg = new Message();
                 msg.type = (MessageType)reader.ReadInt32();
 
-                //if (msg.type == MessageType.ControlCommand)
-                //{
-                //    msg.controlBlock = ReadControlBlock(reader);
-                //}
-                //else
-                //{
-                //    msg.communicationBlock = ReadCommunicationBlock(reader);
-                //}
-
                 msg.controlBlock = ReadControlBlock(reader);
                 msg.communicationBlock = ReadCommunicationBlock(reader);
                 
@@ -55,8 +46,8 @@ namespace VectorClock.Common
             VectorClockImpl clock = new VectorClockImpl((int)reader.ReadInt32());
 
             clock[0] = (int)reader.ReadInt32();
-            clock[0] = (int)reader.ReadInt32();
-            clock[0] = (int)reader.ReadInt32();
+            clock[1] = (int)reader.ReadInt32();
+            clock[2] = (int)reader.ReadInt32();
 
             block.clock = clock;
 

@@ -16,16 +16,6 @@ namespace VectorClock.Common
             {
                 writer.Write((int)msg.type);
 
-                //if (msg.type == MessageType.ControlCommand)
-                //{
-                //    WriteControlBlock(writer, msg.controlBlock);
-                //}
-                //else
-                //{
-                //    WriteCommunicationBlock(writer, msg.communicationBlock);
-                //}
-
-
                 if (msg.controlBlock != null)
                 {
                     WriteControlBlock(writer, msg.controlBlock);

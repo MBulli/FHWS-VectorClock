@@ -20,39 +20,38 @@ namespace VectorClock.Node
 
         public bool HandleMessage(Message msg, IPEndPoint remoteEP)
         {
-            msg.communicationBlock = new Message.CommunicationBlock(); // CommBlock from commander-message was empty
-            msg.communicationBlock.clock = this.commLogic.clock;
-            AnswerHost(msg);
+            bool returnValue = false;
 
             if (msg.controlBlock.Command == ControlCommand.Shutdown)
             {
                 Console.WriteLine("Shutdown command received!");
-                return true;
+                returnValue = true;
             }
             else if (msg.controlBlock.Command == ControlCommand.IncreaseBalance)
             {
                 Console.WriteLine("Increase command received!");
                 commLogic.appLogic.IncreaseBalance(msg.communicationBlock.payload.balance);
                 commLogic.IncreaseVectorClock();
-                return true;
+                returnValue = true;
             }
             else if (msg.controlBlock.Command == ControlCommand.DecreaseBalance)
             {
                 Console.WriteLine("Decrease command received!");
                 commLogic.appLogic.DecreaseBalance(msg.communicationBlock.payload.balance);
                 commLogic.IncreaseVectorClock();
-
-                return true;
+                returnValue = true;
             }
             else if (msg.controlBlock.Command == ControlCommand.Echo)
             {
                 Console.WriteLine("Echo command received!");
-                return true;
+                returnValue = true;
             }
-            else
-            {
-                return false;
-            }
+
+            //msg.communicationBlock = new Message.CommunicationBlock(); // CommBlock from commander-message was empty
+            msg.communicationBlock.clock = this.commLogic.clock;
+            AnswerHost(msg);
+
+            return returnValue;
         }
 
         private void AnswerHost(Message msg)

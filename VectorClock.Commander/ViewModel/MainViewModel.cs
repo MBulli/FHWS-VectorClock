@@ -89,10 +89,9 @@ namespace VectorClock.Commander.ViewModel
                     startCommand = new RelayCommand(async () =>
                     {
                         Message msg = new Message();
-                        msg.controlBlock = new Message.ControlBlock();
 
-                        msg.controlBlock.Command = ControlCommand.Shutdown;
-                        //msg.communicationBlock.payload.balance = 10;
+                        msg.controlBlock.Command = ControlCommand.IncreaseBalance;
+                        msg.communicationBlock.payload.balance = 10;
 
                         await Task.WhenAll(
                                         Node1.SendMessageAsync(msg, 1337),
