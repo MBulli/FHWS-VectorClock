@@ -52,14 +52,15 @@ namespace VectorClock.Commander.ViewModel
             }
         }
 
-        public async Task sendMessage(Message msg, IPAddress destination, int port)
+        public async Task SendMessageAsync(Message msg, int port)
         {
             using (UdpClient client = new UdpClient())
             {
-                IPEndPoint endPoint = new IPEndPoint(destination, port);
+                IPEndPoint endPoint = new IPEndPoint(this.IpAddress, port);
                 client.Connect(endPoint);
                 byte[] data = MessageSerializer.Serialze(msg);
-                client.Send(data, data.Length);
+
+                await client.SendAsync(data, data.Length);
             }
         }
     }

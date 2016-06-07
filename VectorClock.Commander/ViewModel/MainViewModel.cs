@@ -63,11 +63,10 @@ namespace VectorClock.Commander.ViewModel
                 {
                     if (client.Available > 0) // Only read if we have some data 
                     {
-                        IPEndPoint remoteEP = null;
-                        byte[] data = client.Receive(ref remoteEP);
-
-                        Message msg = MessageDeserializer.Deserialize(data);
-                        TextBoxContent += $"Answer from: { remoteEP.Address}:{remoteEP.Port}. Message: {msg.controlBlock.Command} \n Clock: {msg.communicationBlock.clock}\n" ;
+                        UdpReceiveResult result = await client.ReceiveAsync();
+                               
+                        Message msg = MessageDeserializer.Deserialize(result.Buffer);
+                        TextBoxContent += $"Answer from: { result.RemoteEndPoint.Address}:{result.RemoteEndPoint.Port}. Message: {msg.controlBlock.Command} \n Clock: {msg.communicationBlock.clock}\n" ;
                     }
                 }
             }
@@ -80,11 +79,6 @@ namespace VectorClock.Commander.ViewModel
             Task.Run(async () => await Node3.CheckConnectivity());
         }
 
-        public void SendMessageAsync(NodeViewModel node, Message msg, int port)
-        {
-            Task.Run(async () => await node.sendMessage(msg, node.IpAddress, port));
-        }
-
         private RelayCommand startCommand;
         public RelayCommand StartCommand //buttonclick
         {
@@ -92,7 +86,7 @@ namespace VectorClock.Commander.ViewModel
             {
                 if(startCommand == null)
                 {
-                    startCommand = new RelayCommand(() =>
+                    startCommand = new RelayCommand(async () =>
                     {
                         Message msg = new Message();
                         msg.controlBlock = new Message.ControlBlock();
@@ -100,9 +94,10 @@ namespace VectorClock.Commander.ViewModel
                         msg.controlBlock.Command = ControlCommand.Shutdown;
                         //msg.communicationBlock.payload.balance = 10;
 
-                        SendMessageAsync(Node1, msg, 1337);
-                        SendMessageAsync(Node2, msg, 1338);
-                        SendMessageAsync(Node3, msg, 1339);
+                        await Task.WhenAll(
+                                        Node1.SendMessageAsync(msg, 1337),
+                                        Node2.SendMessageAsync(msg, 1338),
+                                        Node3.SendMessageAsync(msg, 1339));
                     });
                 }
                 return startCommand;
