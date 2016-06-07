@@ -38,10 +38,12 @@ namespace VectorClock.Common
         public static Message.CommunicationBlock ReadCommunicationBlock(BinaryReader reader)
         {
             int balance = (int)reader.ReadInt32();
+            int port = (int)reader.ReadInt32();
 
             Message.CommunicationBlock block = new Message.CommunicationBlock();
             block.payload = new Message.CommunicationPayload();
             block.payload.balance = balance;
+            block.payload.port = port;
 
             VectorClockImpl clock = new VectorClockImpl((int)reader.ReadInt32());
 

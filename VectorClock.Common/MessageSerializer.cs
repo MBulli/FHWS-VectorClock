@@ -48,6 +48,7 @@ namespace VectorClock.Common
                 block.payload = new Message.CommunicationPayload();
             }
             writer.Write((int)block.payload.balance);   // write payload
+            writer.Write((int)block.payload.port);      // write port for sendMessageTo command
 
             if(block.clock == null)
             {

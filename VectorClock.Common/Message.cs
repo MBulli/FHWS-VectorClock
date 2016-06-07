@@ -42,6 +42,7 @@ namespace VectorClock.Common
         public class CommunicationPayload
         {
             public decimal balance;
+            public int port;            // port that a node sends a message to 
         }
         
     }
@@ -57,6 +58,8 @@ namespace VectorClock.Common
         Shutdown,
         IncreaseBalance,
         DecreaseBalance,
+        SendMessageTo,
+        Update,
         Echo
     }
 }

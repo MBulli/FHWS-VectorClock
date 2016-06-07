@@ -97,6 +97,13 @@ namespace VectorClock.Commander.ViewModel
                                         Node1.SendMessageAsync(msg, 1337),
                                         Node2.SendMessageAsync(msg, 1338),
                                         Node3.SendMessageAsync(msg, 1339));
+
+                        Message msg2 = new Message();
+
+                        msg2.controlBlock.Command = ControlCommand.SendMessageTo;
+                        msg2.communicationBlock.payload.port = 1338;
+
+                        await Task.WhenAll(Node1.SendMessageAsync(msg2, 1337));
                     });
                 }
                 return startCommand;
