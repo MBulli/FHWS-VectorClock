@@ -65,7 +65,13 @@ namespace VectorClock.Commander.ViewModel
                     UdpReceiveResult result = await client.ReceiveAsync();
                                
                     Message msg = MessageDeserializer.Deserialize(result.Buffer);
-                    TextBoxContent += $"Answer from: { result.RemoteEndPoint.Address}:{result.RemoteEndPoint.Port}. Message: {msg.controlBlock.Command} \n Balance: {msg.communicationBlock.payload.balance} Clock: {msg.communicationBlock.clock}\n" ;
+
+                    TextBoxContent += string.Format("{0:HH:mm:ss}: Answer from {1}. Message: {2}\n Balance: {3} Clock: {4}\n", 
+                        DateTime.Now, 
+                        result.RemoteEndPoint, 
+                        msg.controlBlock.Command, 
+                        msg.communicationBlock.payload.balance,
+                        msg.communicationBlock.clock);
                 }
             }
         }
