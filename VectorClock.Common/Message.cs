@@ -31,7 +31,8 @@ namespace VectorClock.Common
         public class ControlBlock
         {
             public ControlCommand Command;
-            public decimal BalanceDelta;
+            public decimal BalanceDelta; // used by In/Decrease/SetBalance
+            public IPEndPoint SendMessageTarget = new IPEndPoint(IPAddress.None, 0); // used by SendMessageTo
         }
 
         public class CommunicationBlock
@@ -43,7 +44,6 @@ namespace VectorClock.Common
         public class CommunicationPayload
         {
             public decimal balance;
-            public int port;            // port that a node sends a message to 
         }
         
     }

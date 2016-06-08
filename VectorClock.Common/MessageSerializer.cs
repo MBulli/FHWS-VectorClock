@@ -42,6 +42,7 @@ namespace VectorClock.Common
         {
             writer.Write((int)block.Command);
             writer.Write(block.BalanceDelta);
+            SerializeIPEndpoint(writer, block.SendMessageTarget);
         }
 
         private static void WriteCommunicationBlock(BinaryWriter writer, Message.CommunicationBlock block)
@@ -50,8 +51,8 @@ namespace VectorClock.Common
             {
                 block.payload = new Message.CommunicationPayload();
             }
+
             writer.Write((int)block.payload.balance);   // write payload
-            writer.Write((int)block.payload.port);      // write port for sendMessageTo command
 
             if(block.clock == null)
             {
@@ -66,6 +67,12 @@ namespace VectorClock.Common
             writer.Write((int)clock[0]);
             writer.Write((int)clock[1]);
             writer.Write((int)clock[2]);
+        }
+
+        private static void SerializeIPEndpoint(BinaryWriter writer, System.Net.IPEndPoint ep)
+        {
+            writer.Write(ep.Address.GetAddressBytes());
+            writer.Write(ep.Port);
         }
     }
 }

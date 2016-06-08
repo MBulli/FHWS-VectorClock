@@ -77,14 +77,14 @@ namespace VectorClock.Commander.ViewModel
             Task.Run(async () => await Node3.CheckConnectivity());
         }
 
-        private RelayCommand startCommand;
-        public RelayCommand StartCommand //buttonclick
+        private RelayCommand testCommand;
+        public RelayCommand TestCommand
         {
             get
             {
-                if(startCommand == null)
+                if (testCommand == null)
                 {
-                    startCommand = new RelayCommand(async () =>
+                    testCommand = new RelayCommand(async () =>
                     {
                         Message msg = new Message();
 
@@ -99,12 +99,12 @@ namespace VectorClock.Commander.ViewModel
                         Message msg2 = new Message();
 
                         msg2.controlBlock.Command = ControlCommand.SendMessageTo;
-                        msg2.communicationBlock.payload.port = 1338;
+                        msg2.controlBlock.SendMessageTarget = Node2.IpEndpoint;
 
-                        await Task.WhenAll(Node1.SendMessageAsync(msg2));
+                        await Node1.SendMessageAsync(msg2);
                     });
                 }
-                return startCommand;
+                return testCommand;
             }
         }
 

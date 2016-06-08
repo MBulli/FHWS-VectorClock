@@ -28,11 +28,13 @@ namespace VectorClock.Common
         {
             ControlCommand cmd = (ControlCommand)reader.ReadInt32();
             decimal balanceDelta = reader.ReadDecimal();
+            System.Net.IPEndPoint target = DeserializeIPEndpoint(reader);
 
             return new Message.ControlBlock()
             {
                 Command = cmd,
-                BalanceDelta = balanceDelta
+                BalanceDelta = balanceDelta,
+                SendMessageTarget = target
             };
         }
 
@@ -44,7 +46,6 @@ namespace VectorClock.Common
             Message.CommunicationBlock block = new Message.CommunicationBlock();
             block.payload = new Message.CommunicationPayload();
             block.payload.balance = balance;
-            block.payload.port = port;
 
             VectorClockImpl clock = new VectorClockImpl((int)reader.ReadInt32());
 
@@ -55,6 +56,14 @@ namespace VectorClock.Common
             block.clock = clock;
 
             return block;
+        }
+
+        public static System.Net.IPEndPoint DeserializeIPEndpoint(BinaryReader reader)
+        {
+            byte[] address = reader.ReadBytes(4);
+            int port = reader.ReadInt32();
+
+            return new System.Net.IPEndPoint(new System.Net.IPAddress(address), port);
         }
     }
 }

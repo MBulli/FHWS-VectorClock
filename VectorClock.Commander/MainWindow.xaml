@@ -27,6 +27,7 @@
 
         <StackPanel Grid.ColumnSpan="3" Orientation="Horizontal">
             <Button Content="Reset balance" Command="{Binding ResetBalanceCommand}" />
+            <Button Content="Just do it!" Command="{Binding TestCommand}" />
         </StackPanel>
 
         <v:NodeInfoControl Grid.Row="1" Grid.Column="0" DataContext="{Binding Node1}" />

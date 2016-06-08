@@ -24,13 +24,14 @@ namespace VectorClock.Node
 
             if(msg.controlBlock.Command == ControlCommand.SendMessageTo)
             {
-                Console.WriteLine($"SendMessageTo({msg.communicationBlock.payload.port}) command received!");
+                Console.WriteLine($"SendMessageTo({msg.controlBlock.SendMessageTarget}) command received!");
+
                 Message messageToNote = new Message();
                 messageToNote.controlBlock.Command = ControlCommand.Update;
                 messageToNote.communicationBlock.clock = this.commLogic.clock;
                 messageToNote.communicationBlock.payload.balance = this.commLogic.appLogic.balance;
 
-                SendMessageTo(messageToNote.controlBlock.Command.ToString(), messageToNote, msg.communicationBlock.payload.port);
+                SendMessageTo(messageToNote.controlBlock.Command.ToString(), messageToNote, msg.controlBlock.SendMessageTarget);
                 returnValue = true;
             }
             else if(msg.controlBlock.Command == ControlCommand.Update)
@@ -102,19 +103,19 @@ namespace VectorClock.Node
 
         private void AnswerHost(Message msg)
         {
-            SendMessageTo("HostAnswer", msg, 1340);
+            SendMessageTo("HostAnswer", msg, new IPEndPoint(IPAddress.Loopback, 1340));
         }
 
-        private void SendMessageTo(String messageText, Message msg, int port)
+        private void SendMessageTo(String messageText, Message msg, IPEndPoint endpoint)
         {
             using (UdpClient client = new UdpClient())
             {
-                client.Connect(IPAddress.Loopback, port);
+                client.Connect(endpoint);
 
                 byte[] data = MessageSerializer.Serialze(msg);
                 client.Send(data, data.Length);
 
-                Console.WriteLine($"Message ({messageText}) sent to {IPAddress.Loopback}:{port}");
+                Console.WriteLine($"Message ({messageText}) sent to {endpoint}");
             }
         }
     }
