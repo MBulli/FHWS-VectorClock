@@ -46,14 +46,11 @@ namespace VectorClock.Node
             {
                 while (true)
                 {
-                    if (client.Available > 0) // Only read if we have some data 
-                    {
-                        IPEndPoint remoteEP = null;
-                        byte[] data = client.Receive(ref remoteEP);
+                    IPEndPoint remoteEP = null;
+                    byte[] data = client.Receive(ref remoteEP);
 
-                        Message msg = MessageDeserializer.Deserialize(data);
-                        controlLogic.HandleMessage(msg, remoteEP);
-                    }
+                    Message msg = MessageDeserializer.Deserialize(data);
+                    controlLogic.HandleMessage(msg, remoteEP);
                 }
             }
         }

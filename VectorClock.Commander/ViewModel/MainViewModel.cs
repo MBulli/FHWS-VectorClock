@@ -61,13 +61,10 @@ namespace VectorClock.Commander.ViewModel
             {
                 while (true)
                 {
-                    if (client.Available > 0) // Only read if we have some data 
-                    {
-                        UdpReceiveResult result = await client.ReceiveAsync();
+                    UdpReceiveResult result = await client.ReceiveAsync();
                                
-                        Message msg = MessageDeserializer.Deserialize(result.Buffer);
-                        TextBoxContent += $"Answer from: { result.RemoteEndPoint.Address}:{result.RemoteEndPoint.Port}. Message: {msg.controlBlock.Command} \n Balance: {msg.communicationBlock.payload.balance} Clock: {msg.communicationBlock.clock}\n" ;
-                    }
+                    Message msg = MessageDeserializer.Deserialize(result.Buffer);
+                    TextBoxContent += $"Answer from: { result.RemoteEndPoint.Address}:{result.RemoteEndPoint.Port}. Message: {msg.controlBlock.Command} \n Balance: {msg.communicationBlock.payload.balance} Clock: {msg.communicationBlock.clock}\n" ;
                 }
             }
         }
