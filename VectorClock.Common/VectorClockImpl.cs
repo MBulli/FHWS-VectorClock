@@ -47,58 +47,72 @@ namespace VectorClock.Common
 
         public ComparisonResult Compare(VectorClockImpl other)
         {
-            // Check this before other
-            if (AllElementsLessThanOrEqual(this.timestamps, other.timestamps)
-             && AnyElementLessThan(this.timestamps, other.timestamps))
+            if(isEqual(this.timestamps, other.timestamps))
             {
-                return ComparisonResult.Before;
-            }
-            else if(AllElementsConcurrent(this.timestamps, other.timestamps))
+                throw new InvalidOperationException();
+            } else 
+            if(isConcurrent(this.timestamps, other.timestamps))
             {
                 return ComparisonResult.Concurrent;
+            } else 
+            if(lessThanOrEqual(this.timestamps, other.timestamps))
+            {
+                return ComparisonResult.Before;
             }
 
             return ComparisonResult.After;
         }
 
-        private bool AllElementsLessThanOrEqual(int[] a, int[] b)
+        private bool lessThanOrEqual(int[] a, int[] b)
         {
-            for (int k = 0; k < a.Length; k++)
+            bool lessThanOrEqual = true;
+
+            for(int k = 0; k < a.Length; k++)
             {
-                if (!(a[k] <= b[k]))
+                if(a[k] > b[k])
                 {
-                    return false;
+                    lessThanOrEqual = false;
                 }
             }
 
-            return true;
+            return lessThanOrEqual;
         }
 
-        private bool AnyElementLessThan(int[] a, int[] b)
+        private bool isConcurrent(int[] a, int[] b)
         {
-            for (int k = 0; k < a.Length; k++)
+            bool greater = false;
+            bool less = false;
+
+            for(int i = 0; i < a.Length; i++)
             {
-                if (a[k] < b[k])
+                if(a[i] > b[i])
                 {
-                    return true;
+                    greater = true;
+                }
+                else if(a[i] < a[i])
+                {
+                    less = true;
                 }
             }
 
-            return false;
+            return (greater && less);
         }
 
-        private bool AllElementsConcurrent(int[] a, int[] b)
+        private bool isEqual(int[] a, int[] b)
         {
+            bool isEqual = true;
+
             for(int k = 0; k < a.Length; k++)
             {
                 if(a[k] != b[k])
                 {
-                    return false;
+                    isEqual = false;
                 }
             }
-        
-            return true;
+
+            return isEqual;
         }
+        
 
         public override string ToString()
         {
