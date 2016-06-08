@@ -42,6 +42,30 @@ namespace VectorClock.Node
             {
                 Console.WriteLine("Update command received!");
                 // TODO: Check if the clock from received updateMessage is newer than own and handle that!
+
+                switch (this.commLogic.clock.Compare(msg.communicationBlock.clock))
+                {
+                    case ComparisonResult.Before:
+                        Console.WriteLine(" Update: Own clock is older, update!");
+                        Console.WriteLine($" Update: Old clock: {this.commLogic.clock} New clock: {msg.communicationBlock.clock}");
+                        Console.WriteLine($" Update: Old balance: {this.commLogic.appLogic.balance} New Balance: {msg.communicationBlock.payload.balance}");
+
+                        this.commLogic.clock.update(msg.communicationBlock.clock);
+                        this.commLogic.appLogic.balance = msg.communicationBlock.payload.balance;
+                        break;
+                    case ComparisonResult.Concurrent:
+                        Console.WriteLine(" Update: Clocks are equal!");
+                        if(this.commLogic.appLogic.balance != msg.communicationBlock.payload.balance)
+                        {
+                            Console.WriteLine($" Update: Error, balances are unequal! {this.commLogic.appLogic.balance} != {msg.communicationBlock.payload.balance}");
+                        }
+                        break;
+                    case ComparisonResult.After:
+                        Console.WriteLine(" Update: Own clock is newer!");
+                        // TODO: what to do here?!
+                        break;
+                }
+
             }
             else if (msg.controlBlock.Command == ControlCommand.IncreaseBalance)
             {

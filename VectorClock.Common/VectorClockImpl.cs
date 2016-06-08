@@ -40,6 +40,11 @@ namespace VectorClock.Common
             timestamps[index] = value;
         }
 
+        public void update(VectorClockImpl other)
+        {
+            this.timestamps = other.timestamps;
+        }
+
         public ComparisonResult Compare(VectorClockImpl other)
         {
             // Check this before other
@@ -48,9 +53,12 @@ namespace VectorClock.Common
             {
                 return ComparisonResult.Before;
             }
+            else if(AllElementsConcurrent(this.timestamps, other.timestamps))
+            {
+                return ComparisonResult.Concurrent;
+            }
 
-
-            throw new NotImplementedException();
+            return ComparisonResult.After;
         }
 
         private bool AllElementsLessThanOrEqual(int[] a, int[] b)
@@ -77,6 +85,19 @@ namespace VectorClock.Common
             }
 
             return false;
+        }
+
+        private bool AllElementsConcurrent(int[] a, int[] b)
+        {
+            for(int k = 0; k < a.Length; k++)
+            {
+                if(a[k] != b[k])
+                {
+                    return false;
+                }
+            }
+        
+            return true;
         }
 
         public override string ToString()
