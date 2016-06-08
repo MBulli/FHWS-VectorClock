@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace VectorClock.Common
 {
+    [Serializable]
     public class Message
     {
         public MessageType type;
@@ -28,6 +29,7 @@ namespace VectorClock.Common
             communicationBlock.payload = new CommunicationPayload();
         }
 
+        [Serializable]
         public class ControlBlock
         {
             public ControlCommand Command;
@@ -35,12 +37,14 @@ namespace VectorClock.Common
             public IPEndPoint SendMessageTarget = new IPEndPoint(IPAddress.None, 0); // used by SendMessageTo
         }
 
+        [Serializable]
         public class CommunicationBlock
         {
             public VectorClockImpl clock;
             public CommunicationPayload payload;
         }
-        
+
+        [Serializable]
         public class CommunicationPayload
         {
             public decimal balance;

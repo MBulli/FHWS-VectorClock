@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace VectorClock.Common
 {
+    [Serializable]
     public class VectorClockImpl
     {
         int id = -1;
