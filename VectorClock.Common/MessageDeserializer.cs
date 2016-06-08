@@ -20,7 +20,6 @@ namespace VectorClock.Common
                 msg.controlBlock = ReadControlBlock(reader);
                 msg.communicationBlock = ReadCommunicationBlock(reader);
                 
-
                 return msg;
             }          
         }
@@ -28,10 +27,12 @@ namespace VectorClock.Common
         public static Message.ControlBlock ReadControlBlock(BinaryReader reader)
         {
             ControlCommand cmd = (ControlCommand)reader.ReadInt32();
+            decimal balanceDelta = reader.ReadDecimal();
 
             return new Message.ControlBlock()
             {
-                Command = cmd
+                Command = cmd,
+                BalanceDelta = balanceDelta
             };
         }
 

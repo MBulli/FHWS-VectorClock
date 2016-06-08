@@ -11,8 +11,17 @@
         <GroupBox Header="{Binding Name}" >
             <StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock x:Name="IpAddress" Text="{Binding Path=IpAddress, StringFormat=IP: {0} }" />
+                    <TextBlock x:Name="IpAddress" Text="{Binding Path=IpEndpoint, StringFormat=IP: {0} }" />
                     <Ellipse Height="10" Width="10" Margin="5,0,0,0" Fill="{Binding Path=IsConnected, Converter={c:BooleanToBrushConverter FalseBrush=Red, TrueBrush=Green}}" />
+                </StackPanel>
+                <TextBlock x:Name="currentBalance" Text="900€" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Update balance:" Margin="0,0,5,0" />
+                    <TextBox x:Name="balanceDelta" MinWidth="50" Text="{Binding Path=BalanceDeltaText, UpdateSourceTrigger=PropertyChanged}">
+                        <TextBox.InputBindings>
+                            <KeyBinding Key="Enter" Command="{Binding UpdateBalanceCommand}" />
+                        </TextBox.InputBindings>
+                    </TextBox>
                 </StackPanel>
             </StackPanel>
 

@@ -19,7 +19,8 @@ namespace VectorClock.Common
                 if (msg.controlBlock != null)
                 {
                     WriteControlBlock(writer, msg.controlBlock);
-                } else
+                }
+                else
                 {
                     WriteControlBlock(writer, new Message.ControlBlock());
                 }
@@ -27,7 +28,8 @@ namespace VectorClock.Common
                 if (msg.communicationBlock != null)
                 {
                     WriteCommunicationBlock(writer, msg.communicationBlock);
-                } else
+                }
+                else
                 {
                     WriteCommunicationBlock(writer, new Message.CommunicationBlock());
                 }
@@ -39,6 +41,7 @@ namespace VectorClock.Common
         private static void WriteControlBlock(BinaryWriter writer, Message.ControlBlock block)
         {
             writer.Write((int)block.Command);
+            writer.Write(block.BalanceDelta);
         }
 
         private static void WriteCommunicationBlock(BinaryWriter writer, Message.CommunicationBlock block)

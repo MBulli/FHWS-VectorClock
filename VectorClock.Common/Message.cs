@@ -10,7 +10,7 @@ namespace VectorClock.Common
     public class Message
     {
         public MessageType type;
-        public IPAddress senderAddress;
+        public IPEndPoint senderAddress;
 
         public ControlBlock controlBlock;       
         public CommunicationBlock communicationBlock; 
@@ -19,7 +19,7 @@ namespace VectorClock.Common
         public Message()
         {
             type = new MessageType();
-            senderAddress = IPAddress.Any;
+            senderAddress = new IPEndPoint(IPAddress.Any, 0);
 
             controlBlock = new ControlBlock();
             controlBlock.Command = new ControlCommand();
@@ -31,6 +31,7 @@ namespace VectorClock.Common
         public class ControlBlock
         {
             public ControlCommand Command;
+            public decimal BalanceDelta;
         }
 
         public class CommunicationBlock
@@ -47,13 +48,13 @@ namespace VectorClock.Common
         
     }
 
-    public enum MessageType
+    public enum MessageType : int
     {
         ControlCommand,
         Communication
     }
 
-    public enum ControlCommand
+    public enum ControlCommand : int
     {
         Shutdown,
         IncreaseBalance,

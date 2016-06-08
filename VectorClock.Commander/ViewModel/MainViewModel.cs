@@ -43,9 +43,9 @@ namespace VectorClock.Commander.ViewModel
             //Node3 = new NodeViewModel("mjverteil03", System.Net.IPAddress.Parse("10.10.29.67"));
 
             // this is for one-machine testing only
-            Node1 = new NodeViewModel("mjverteil01", IPAddress.Loopback);
-            Node2 = new NodeViewModel("mjverteil02", IPAddress.Loopback);
-            Node3 = new NodeViewModel("mjverteil03", IPAddress.Loopback);
+            Node1 = new NodeViewModel("mjverteil01", new IPEndPoint(IPAddress.Loopback, 1337));
+            Node2 = new NodeViewModel("mjverteil02", new IPEndPoint(IPAddress.Loopback, 1338));
+            Node3 = new NodeViewModel("mjverteil03", new IPEndPoint(IPAddress.Loopback, 1339));
 
             //NodeLokal = new NodeViewModel("lokal", System.Net.IPAddress.Loopback);
 
@@ -91,16 +91,16 @@ namespace VectorClock.Commander.ViewModel
                         msg.communicationBlock.payload.balance = 10;
 
                         await Task.WhenAll(
-                                        Node1.SendMessageAsync(msg, 1337),
-                                        Node2.SendMessageAsync(msg, 1338),
-                                        Node3.SendMessageAsync(msg, 1339));
+                                        Node1.SendMessageAsync(msg),
+                                        Node2.SendMessageAsync(msg),
+                                        Node3.SendMessageAsync(msg));
 
                         Message msg2 = new Message();
 
                         msg2.controlBlock.Command = ControlCommand.SendMessageTo;
                         msg2.communicationBlock.payload.port = 1338;
 
-                        await Task.WhenAll(Node1.SendMessageAsync(msg2, 1337));
+                        await Task.WhenAll(Node1.SendMessageAsync(msg2));
                     });
                 }
                 return startCommand;
