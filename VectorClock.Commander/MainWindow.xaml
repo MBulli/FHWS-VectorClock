@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:v ="clr-namespace:VectorClock.Commander"
+        xmlns:v ="clr-namespace:VectorClock.Commander.View"
         xmlns:vm="clr-namespace:VectorClock.Commander.ViewModel"
         xmlns:local="clr-namespace:VectorClock.Commander"
         mc:Ignorable="d"
@@ -33,7 +33,7 @@
         <v:NodeInfoControl Grid.Row="1" Grid.Column="0" DataContext="{Binding Node1}" />
         <v:NodeInfoControl Grid.Row="1" Grid.Column="1" DataContext="{Binding Node2}" />
         <v:NodeInfoControl Grid.Row="1" Grid.Column="2" DataContext="{Binding Node3}" />
-        <TextBox x:Name="answerTexbox"
+        <v:AutoScrollTextBox x:Name="answerTexbox"
                  IsReadOnly="true"
                  FontFamily="Consolas"
                  Grid.Row="2" Grid.ColumnSpan="3"
