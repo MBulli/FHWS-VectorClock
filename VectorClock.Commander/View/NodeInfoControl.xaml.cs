@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace VectorClock.Commander
+namespace VectorClock.Commander.View
 {
     /// <summary>
     /// Interaction logic for NodeInfoControl.xaml
