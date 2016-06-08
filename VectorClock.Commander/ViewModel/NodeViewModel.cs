@@ -94,6 +94,7 @@ namespace VectorClock.Commander.ViewModel
             if (decimal.TryParse(BalanceDeltaText, out delta))
             {
                 Message msg = new Message();
+                msg.type = MessageType.ControlCommand;
                 msg.controlBlock.Command = delta < 0 ? ControlCommand.DecreaseBalance : ControlCommand.IncreaseBalance;
                 msg.controlBlock.BalanceDelta = Math.Abs(delta);
 

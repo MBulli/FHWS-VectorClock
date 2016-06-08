@@ -64,7 +64,7 @@ namespace VectorClock.Common
         IncreaseBalance,
         DecreaseBalance,
         SendMessageTo,
-        Update,
+        Updated,
         Echo
     }
 }
