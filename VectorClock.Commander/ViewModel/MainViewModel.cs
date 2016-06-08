@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Threading;
 using VectorClock.Commander.Helper;
 using VectorClock.Common;
@@ -104,6 +105,31 @@ namespace VectorClock.Commander.ViewModel
                     });
                 }
                 return startCommand;
+            }
+        }
+
+        private RelayCommand resetBalanceCommand;
+        public ICommand ResetBalanceCommand
+        {
+            get
+            {
+                if (resetBalanceCommand == null)
+                {
+                    resetBalanceCommand = new RelayCommand(async () =>
+                    {
+                        Message msg = new Message();
+
+                        msg.controlBlock.Command = ControlCommand.SetBalance;
+                        msg.controlBlock.BalanceDelta = 0;
+
+                        await Task.WhenAll(
+                                        Node1.SendMessageAsync(msg),
+                                        Node2.SendMessageAsync(msg),
+                                        Node3.SendMessageAsync(msg));
+                    });
+                }
+
+                return resetBalanceCommand;
             }
         }
 

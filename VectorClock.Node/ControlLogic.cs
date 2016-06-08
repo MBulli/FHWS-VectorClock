@@ -62,6 +62,14 @@ namespace VectorClock.Node
                 }
 
             }
+            else if (msg.controlBlock.Command == ControlCommand.SetBalance)
+            {
+                Console.WriteLine("Set balance command received!");
+                commLogic.appLogic.balance = msg.controlBlock.BalanceDelta;
+                Console.WriteLine($"New balance: {commLogic.appLogic.balance}");
+                commLogic.IncreaseVectorClock();
+                returnValue = true;
+            }
             else if (msg.controlBlock.Command == ControlCommand.IncreaseBalance)
             {
                 Console.WriteLine("Increase command received!");
