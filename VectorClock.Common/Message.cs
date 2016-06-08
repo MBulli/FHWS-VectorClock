@@ -20,7 +20,6 @@ namespace VectorClock.Common
         public Message()
         {
             type = new MessageType();
-            senderAddress = new IPEndPoint(IPAddress.Any, 0);
 
             controlBlock = new ControlBlock();
             controlBlock.Command = new ControlCommand();
