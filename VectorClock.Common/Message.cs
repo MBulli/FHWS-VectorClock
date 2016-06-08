@@ -56,7 +56,6 @@ namespace VectorClock.Common
 
     public enum ControlCommand : int
     {
-        Shutdown,
         IncreaseBalance,
         DecreaseBalance,
         SendMessageTo,

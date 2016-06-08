@@ -22,12 +22,7 @@ namespace VectorClock.Node
         {
             bool returnValue = false;
 
-            if (msg.controlBlock.Command == ControlCommand.Shutdown)
-            {
-                Console.WriteLine("Shutdown command received!");
-                returnValue = true;
-            }
-            else if(msg.controlBlock.Command == ControlCommand.SendMessageTo)
+            if(msg.controlBlock.Command == ControlCommand.SendMessageTo)
             {
                 Console.WriteLine($"SendMessageTo({msg.communicationBlock.payload.port}) command received!");
                 Message messageToNote = new Message();
