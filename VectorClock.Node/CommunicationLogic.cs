@@ -14,6 +14,8 @@ namespace VectorClock.Node
 
         public readonly ApplicationLogic appLogic;
 
+        public readonly IPEndPoint endPoint;
+
         public CommunicationLogic(ApplicationLogic appLogic, int ownerIndex)
         {
             this.clock = new VectorClockImpl(ownerIndex);

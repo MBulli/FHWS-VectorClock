@@ -51,12 +51,12 @@ namespace VectorClock.Common
             if(isEqual(this.timestamps, other.timestamps))
             {
                 throw new InvalidOperationException();
-            } else 
-            if(isConcurrent(this.timestamps, other.timestamps))
+            }
+            else if(isConcurrent(this.timestamps, other.timestamps))
             {
                 return ComparisonResult.Concurrent;
-            } else 
-            if(lessThanOrEqual(this.timestamps, other.timestamps))
+            }
+            else if(lessThanOrEqual(this.timestamps, other.timestamps))
             {
                 return ComparisonResult.Before;
             }

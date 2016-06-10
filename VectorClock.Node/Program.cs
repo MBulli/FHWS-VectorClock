@@ -35,9 +35,11 @@ namespace VectorClock.Node
                 return;
             }
 
+            IPEndPoint endPoint = new IPEndPoint(IPAddress.Loopback, port);
+
             ApplicationLogic appLogic = new ApplicationLogic();
             CommunicationLogic commLogic = new CommunicationLogic(appLogic, hostID);
-            ControlLogic controlLogic = new ControlLogic(commLogic);
+            ControlLogic controlLogic = new ControlLogic(commLogic, endPoint);
 
             Console.WriteLine($"Node with Id {hostID} and IP-address {Dns.GetHostName().ToString()} started properly.");
             Console.WriteLine($"Listening to UDP-Port: {port}");

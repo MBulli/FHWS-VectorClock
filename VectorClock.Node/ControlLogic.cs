@@ -12,10 +12,12 @@ namespace VectorClock.Node
     class ControlLogic
     {
         CommunicationLogic commLogic;
+        IPEndPoint endPoint;
 
-        public ControlLogic(CommunicationLogic commLogic)
+        public ControlLogic(CommunicationLogic commLogic, IPEndPoint endPoint)
         {
             this.commLogic = commLogic;
+            this.endPoint = endPoint;
         }
 
         public bool HandleMessage(Message msg, IPEndPoint remoteEP)
@@ -68,6 +70,7 @@ namespace VectorClock.Node
                 commLogic.appLogic.IncreaseBalance(msg.controlBlock.BalanceDelta);
                 Console.WriteLine($"New balance: {commLogic.appLogic.balance}");
                 commLogic.IncreaseVectorClock();
+                BroadcastChange();
                 returnValue = true;
             }
             else if (msg.controlBlock.Command == ControlCommand.DecreaseBalance)
@@ -76,6 +79,7 @@ namespace VectorClock.Node
                 commLogic.appLogic.DecreaseBalance(msg.controlBlock.BalanceDelta);
                 Console.WriteLine($"New balance: {commLogic.appLogic.balance}");
                 commLogic.IncreaseVectorClock();
+                BroadcastChange();
                 returnValue = true;
             }
             else if (msg.controlBlock.Command == ControlCommand.Echo)
@@ -127,16 +131,36 @@ namespace VectorClock.Node
             SendMessageTo("HostAnswer", msg, new IPEndPoint(IPAddress.Loopback, 1340));
         }
 
-        private void SendMessageTo(String messageText, Message msg, IPEndPoint endpoint)
+        private void BroadcastChange()
         {
+            var msg = MessageFactory.Communication.CreateUpdateMessage(this.commLogic.appLogic.balance, this.commLogic.clock);
+
+            var endpoints = new IPEndPoint[] {
+                new IPEndPoint(IPAddress.Loopback, 1337),
+                new IPEndPoint(IPAddress.Loopback, 1338),
+                new IPEndPoint(IPAddress.Loopback, 1339)
+            };
+
+            foreach (var node in endpoints.Where(ep => !ep.Equals(endPoint)))
+            {
+                SendMessageTo("Broadcast", msg, node);
+            }
+        }
+
+        private void SendMessageTo(String messageText, Message msg, IPEndPoint node)
+        {
+            if(this.endPoint.Equals(node))
+            {
+                throw new InvalidOperationException("Sendmessage: Endpoints are equal!");
+            }
             using (UdpClient client = new UdpClient())
             {
-                client.Connect(endpoint);
+                client.Connect(node);
 
                 byte[] data = MessageSerializer.Serialze(msg);
                 client.Send(data, data.Length);
 
-                Console.WriteLine($"Message ({messageText}) sent to {endpoint}");
+                Console.WriteLine($"Message ({messageText}) sent to {node}");
             }
         }
     }
