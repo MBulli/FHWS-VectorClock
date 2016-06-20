@@ -72,7 +72,21 @@ namespace VectorClock.Commander.ViewModel
                         msg.controlBlock.Command, 
                         msg.communicationBlock.payload.balance,
                         msg.communicationBlock.clock);
+
+                    NodeFromMessage(msg).CurrentBalance = msg.communicationBlock.payload.balance;
+                    
                 }
+            }
+        }
+
+        private NodeViewModel NodeFromMessage(Message msg)
+        {
+            switch (msg.communicationBlock.clock.getID())
+            {
+                case 0: return Node1;
+                case 1: return Node2;
+                case 2: return Node3;
+                default: throw new InvalidOperationException($"Invalid node id '{msg.communicationBlock.clock.getID()}'");
             }
         }
 
