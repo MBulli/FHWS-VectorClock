@@ -12,6 +12,7 @@ namespace VectorClock.Common
     {
         public MessageType type;
         public IPEndPoint senderAddress;
+        public int casualBroadcastID = 0;
 
         public ControlBlock controlBlock;       
         public CommunicationBlock communicationBlock; 
@@ -60,6 +61,8 @@ namespace VectorClock.Common
     public enum ControlCommand : int
     {
         SetBalance,
+        AnswerToBroadcast,
+        BroadcastAnswer,
         IncreaseBalance,
         DecreaseBalance,
         SendMessageTo,
