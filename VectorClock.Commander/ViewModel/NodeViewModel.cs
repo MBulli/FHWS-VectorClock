@@ -42,7 +42,7 @@ namespace VectorClock.Commander.ViewModel
             set { currentBalance = value; OnNotifyPropertyChanged(); }
         }
 
-        private string currentClock;
+        private string currentClock = "ID= -: [-,-,-]";
 
         public string CurrentClock
         {

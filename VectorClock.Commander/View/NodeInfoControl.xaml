@@ -14,7 +14,7 @@
                     <TextBlock x:Name="IpAddress" Text="{Binding Path=IpEndpoint, StringFormat=IP: {0} }" />
                     <Ellipse Height="10" Width="10" Margin="5,0,0,0" Fill="{Binding Path=IsConnected, Converter={c:BooleanToBrushConverter FalseBrush=Red, TrueBrush=Green}}" />
                 </StackPanel>
-                <TextBlock x:Name="currentBalance" Text="{Binding CurrentBalance}" />
+                <TextBlock x:Name="currentBalance" Text="{Binding CurrentBalance, StringFormat=Balance: {0} }" />
                 <TextBlock x:Name="currentClock" Text="{Binding CurrentClock, StringFormat=Clock: {0} }" />
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Update balance:" Margin="0,0,5,0" />
