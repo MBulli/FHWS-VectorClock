@@ -74,7 +74,7 @@ namespace VectorClock.Commander.ViewModel
                         msg.communicationBlock.clock);
 
                     NodeFromMessage(msg).CurrentBalance = msg.communicationBlock.payload.balance;
-                    
+                    NodeFromMessage(msg).CurrentClock = msg.communicationBlock.clock.ToString();
                 }
             }
         }

@@ -101,8 +101,6 @@ namespace VectorClock.Node
             returnValue = true;
             Console.WriteLine("Update command received!");
 
-            updateUninitializedClockValues(msg.communicationBlock.clock);
-
             switch (this.commLogic.clock.Compare(msg.communicationBlock.clock))
             {
                 case ComparisonResult.Before:
@@ -125,12 +123,12 @@ namespace VectorClock.Node
                     }
                     break;
                 case ComparisonResult.After:
-                    Console.WriteLine(" Update: Own clock is newer! Merge!");
-                    Console.WriteLine($" Update: Old clock: {this.commLogic.clock} New clock: {msg.communicationBlock.clock}");
-                    Console.WriteLine($" Update: Old balance: {this.commLogic.appLogic.balance} New Balance: {msg.communicationBlock.payload.balance}");
+                    Console.WriteLine(" Update: Own clock is newer! What should i do now?!?!");
+                    //Console.WriteLine($" Update: Old clock: {this.commLogic.clock} New clock: {msg.communicationBlock.clock}");
+                    //Console.WriteLine($" Update: Old balance: {this.commLogic.appLogic.balance} New Balance: {msg.communicationBlock.payload.balance}");
 
-                    this.commLogic.clock.update(msg.communicationBlock.clock);
-                    this.commLogic.appLogic.balance = msg.communicationBlock.payload.balance;
+                    //this.commLogic.clock.update(msg.communicationBlock.clock);
+                    //this.commLogic.appLogic.balance = msg.communicationBlock.payload.balance;
                     
                     break;
             }

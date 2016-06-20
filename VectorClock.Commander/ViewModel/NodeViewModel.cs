@@ -42,6 +42,14 @@ namespace VectorClock.Commander.ViewModel
             set { currentBalance = value; OnNotifyPropertyChanged(); }
         }
 
+        private string currentClock;
+
+        public string CurrentClock
+        {
+            get { return currentClock; }
+            set { currentClock = value;  OnNotifyPropertyChanged(); }
+        }
+
         private string balanceDeltaText;
         public string BalanceDeltaText
         {

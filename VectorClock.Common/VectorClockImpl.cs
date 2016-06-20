@@ -70,9 +70,16 @@ namespace VectorClock.Common
 
             for(int k = 0; k < a.Length; k++)
             {
-                if(a[k] > b[k])
+                if (k != this.id)
                 {
-                    lessThanOrEqual = false;
+                    if (a[k] == 0)
+                    {
+                        a[k] = b[k];
+                    }
+                    else if (a[k] > b[k])
+                    {
+                        lessThanOrEqual = false;
+                    }
                 }
             }
 
@@ -86,13 +93,21 @@ namespace VectorClock.Common
 
             for(int i = 0; i < a.Length; i++)
             {
-                if(a[i] > b[i])
+                if (i != this.id)
                 {
-                    greater = true;
-                }
-                else if(a[i] < b[i])
-                {
-                    less = true;
+                    if (a[i] == 0)
+                    {
+                        a[i] = b[i];
+                    }
+
+                    else if (a[i] > b[i])
+                    {
+                        greater = true;
+                    }
+                    else if (a[i] < b[i])
+                    {
+                        less = true;
+                    }
                 }
             }
 
@@ -105,7 +120,12 @@ namespace VectorClock.Common
 
             for(int k = 0; k < a.Length; k++)
             {
-                if(a[k] != b[k])
+                if (a[k] == 0)
+                {
+                    a[k] = b[k];
+                    isEqual = false;
+                }
+                else if (a[k] != b[k])
                 {
                     isEqual = false;
                 }
