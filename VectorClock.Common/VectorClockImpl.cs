@@ -90,7 +90,7 @@ namespace VectorClock.Common
                 {
                     greater = true;
                 }
-                else if(a[i] < a[i])
+                else if(a[i] < b[i])
                 {
                     less = true;
                 }
