@@ -40,7 +40,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CausalBroadcast.cs" />
     <Compile Include="VectorClockImpl.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="MessageDeserializer.cs" />

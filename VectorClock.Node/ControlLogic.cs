@@ -13,13 +13,13 @@ namespace VectorClock.Node
     {
         CommunicationLogic commLogic;
         IPEndPoint endPoint;
-        int[] receivedBroadcastIDs;
+        List<Message> delayedMessages;
 
         public ControlLogic(CommunicationLogic commLogic, IPEndPoint endPoint)
         {
             this.commLogic = commLogic;
             this.endPoint = endPoint;
-            this.receivedBroadcastIDs = new int[3];
+            this.delayedMessages = new List<Message>();
         }
 
         public bool HandleMessage(bool causallyOrdered, Message msg, IPEndPoint remoteEP)
@@ -128,9 +128,9 @@ namespace VectorClock.Node
                 Console.WriteLine("Increase command received!");
                 commLogic.appLogic.IncreaseBalance(msg.controlBlock.BalanceDelta);
                 Console.WriteLine($"New balance: {commLogic.appLogic.balance}");
-                Console.WriteLine($"New Clock: {this.commLogic.clock}");
                 BroadcastChange();
                 commLogic.IncreaseVectorClock(); // Increase after broadcast if ordered
+                Console.WriteLine($"New Clock: {this.commLogic.clock}");
                 returnValue = true;
             }
             else if (msg.controlBlock.Command == ControlCommand.DecreaseBalance)
@@ -138,9 +138,9 @@ namespace VectorClock.Node
                 Console.WriteLine("Decrease command received!");
                 commLogic.appLogic.DecreaseBalance(msg.controlBlock.BalanceDelta);
                 Console.WriteLine($"New balance: {commLogic.appLogic.balance}");
-                Console.WriteLine($"New Clock: {this.commLogic.clock}");
                 BroadcastChange();
                 commLogic.IncreaseVectorClock(); // Increase after broadcast if ordered
+                Console.WriteLine($"New Clock: {this.commLogic.clock}");
                 returnValue = true;
             }
             else if (msg.controlBlock.Command == ControlCommand.Echo)
@@ -177,23 +177,46 @@ namespace VectorClock.Node
 
             // check if message is suitable
 
-            if(msg.communicationBlock.clock.Compare(this.commLogic.clock) == ComparisonResult.Before)   //  delay until vc(x) <= m.vc(x) for all x
+            if (delayedMessages.Count == 0) // no delayed messages
             {
-                // Todo: Put message in queue
+                if (MessageNotAcceptable(msg))   //  delay until vc(x) <= m.vc(x) for all x
+                {
+                    delayedMessages.Add(msg);   // Put message in queue
+                    Console.WriteLine($"    Message {msg.communicationBlock.clock} is to early, delaying...");
+                }
+                else
+                    UseMessageOrdered(msg);     // Message ist ok, use it!
             }
             else
             {
-                // Todo: Check Messages in queue
-
-                this.commLogic.clock.update(msg.communicationBlock.clock);
-                this.commLogic.appLogic.balance = msg.communicationBlock.payload.balance;
-                if (this.commLogic.clock.getID() != msg.communicationBlock.clock.getID())
+                if(MessageNotAcceptable(msg))
+                    throw new NotImplementedException("More than one delayed messages! Not yet done...");
+                else
                 {
-                    this.commLogic.IncreaseVectorClock(msg.communicationBlock.clock.getID());           // update control variable
-                    Console.WriteLine($"    Increased clock[{msg.communicationBlock.clock.getID()}]: {this.commLogic.clock}");
+                    UseMessageOrdered(msg);
+                    if (!MessageNotAcceptable(delayedMessages.ElementAt(0)))
+                        UseMessageOrdered(delayedMessages.ElementAt(0));
                 }
             }
+
             msg.controlBlock.Command = ControlCommand.Updated;
+        }
+
+        private void UseMessageOrdered(Message msg)
+        {
+            Console.WriteLine($"    Message {msg.communicationBlock.clock} is ok! Using it.");
+            this.commLogic.clock.update(msg.communicationBlock.clock);
+            this.commLogic.appLogic.balance = msg.communicationBlock.payload.balance;
+            if (this.commLogic.clock.getID() != msg.communicationBlock.clock.getID())
+            {
+                this.commLogic.IncreaseVectorClock(msg.communicationBlock.clock.getID());           // update control variable
+                Console.WriteLine($"    Increased clock[{msg.communicationBlock.clock.getID()}]: {this.commLogic.clock}");
+            }
+        }
+
+        private bool MessageNotAcceptable(Message msg)
+        {
+            return (msg.communicationBlock.clock.Compare(this.commLogic.clock) == ComparisonResult.After);
         }
 
         private void AnswerHost(Message msg)

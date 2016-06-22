@@ -53,15 +53,15 @@ namespace VectorClock.Common
 
         public ComparisonResult Compare(VectorClockImpl other)
         {
-            if(isEqual(this.timestamps, other.timestamps))
+            if(IsEqual(this.timestamps, other.timestamps))
             {
-                throw new InvalidOperationException();
+                return ComparisonResult.Equal;
             }
-            else if(isConcurrent(this.timestamps, other.timestamps))
+            else if(IsConcurrent(this.timestamps, other.timestamps))
             {
                 return ComparisonResult.Concurrent;
             }
-            else if(lessThanOrEqual(this.timestamps, other.timestamps))
+            else if(LessThanOrEqual(this.timestamps, other.timestamps))
             {
                 return ComparisonResult.Before;
             }
@@ -69,68 +69,48 @@ namespace VectorClock.Common
             return ComparisonResult.After;
         }
 
-        private bool lessThanOrEqual(int[] a, int[] b)
+        private bool LessThanOrEqual(int[] a, int[] b)
         {
             bool lessThanOrEqual = true;
 
             for(int k = 0; k < a.Length; k++)
-            {
-                if (k != this.id)
+            { 
+                if (a[k] > b[k])
                 {
-                    if (a[k] == 0)
-                    {
-                        a[k] = b[k];
-                    }
-                    else if (a[k] > b[k])
-                    {
-                        lessThanOrEqual = false;
-                    }
+                    lessThanOrEqual = false;
                 }
             }
 
             return lessThanOrEqual;
         }
 
-        private bool isConcurrent(int[] a, int[] b)
+        private bool IsConcurrent(int[] a, int[] b)
         {
             bool greater = false;
             bool less = false;
 
             for(int i = 0; i < a.Length; i++)
             {
-                if (i != this.id)
+                if (a[i] > b[i])
                 {
-                    if (a[i] == 0)
-                    {
-                        a[i] = b[i];
-                    }
-
-                    else if (a[i] > b[i])
-                    {
-                        greater = true;
-                    }
-                    else if (a[i] < b[i])
-                    {
-                        less = true;
-                    }
+                    greater = true;
                 }
+                else if (a[i] < b[i])
+                {
+                    less = true;
+                }           
             }
 
             return (greater && less);
         }
 
-        private bool isEqual(int[] a, int[] b)
+        private bool IsEqual(int[] a, int[] b)
         {
             bool isEqual = true;
 
             for(int k = 0; k < a.Length; k++)
             {
-                if (a[k] == 0)
-                {
-                    a[k] = b[k];
-                    isEqual = false;
-                }
-                else if (a[k] != b[k])
+                if (a[k] != b[k])
                 {
                     isEqual = false;
                 }
@@ -150,6 +130,7 @@ namespace VectorClock.Common
     {
         Before,
         After,
-        Concurrent
+        Concurrent,
+        Equal
     }
 }

@@ -43,6 +43,9 @@ namespace VectorClock.Node
 
             Console.WriteLine($"Node with Id {hostID} and IP-address {Dns.GetHostName().ToString()} started properly.");
             Console.WriteLine($"Listening to UDP-Port: {port}");
+            var causallyOrderedMode = true;
+            var modeString = causallyOrderedMode ? "Causally ordered" : "Not causally ordered";
+            Console.WriteLine($"Mode: {modeString}");
             Console.WriteLine("------------- Start listening to messages -------------");
 
             using (UdpClient client = new UdpClient(port, AddressFamily.InterNetwork))
@@ -53,7 +56,7 @@ namespace VectorClock.Node
                     byte[] data = client.Receive(ref remoteEP);
 
                     Message msg = MessageDeserializer.Deserialize(data);
-                    controlLogic.HandleMessage(true, msg, remoteEP);
+                    controlLogic.HandleMessage(causallyOrderedMode, msg, remoteEP);
                 }
             }
         }
