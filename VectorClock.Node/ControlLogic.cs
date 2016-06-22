@@ -13,7 +13,6 @@ namespace VectorClock.Node
     {
         CommunicationLogic commLogic;
         IPEndPoint endPoint;
-        int CausalBroadcastID = 0;
         int[] receivedBroadcastIDs;
 
         public ControlLogic(CommunicationLogic commLogic, IPEndPoint endPoint)
@@ -23,17 +22,31 @@ namespace VectorClock.Node
             this.receivedBroadcastIDs = new int[3];
         }
 
-        public bool HandleMessage(Message msg, IPEndPoint remoteEP)
+        public bool HandleMessage(bool causallyOrdered, Message msg, IPEndPoint remoteEP)
         {
             bool returnValue = false;
 
             if(msg.type == MessageType.ControlCommand)
             {
-                HandleControlMessage(ref msg);
+                if(causallyOrdered)
+                {
+                    HandleControlMessageOrdered(ref msg);
+                }
+                else
+                {
+                    HandleControlMessage(ref msg);
+                }
             }
             else
-            {
-                HandleCommunicationMessage(ref msg);
+            { 
+                if(causallyOrdered)
+                {
+                    HandleCommunicationMessageOrdered(ref msg);
+                }
+                else
+                {
+                    HandleCommunicationMessage(ref msg);
+                }
             }
 
             // Answer host
@@ -73,7 +86,7 @@ namespace VectorClock.Node
                 Console.WriteLine("Increase command received!");
                 commLogic.appLogic.IncreaseBalance(msg.controlBlock.BalanceDelta);
                 Console.WriteLine($"New balance: {commLogic.appLogic.balance}");
-                commLogic.IncreaseVectorClock();
+                commLogic.IncreaseVectorClock();                                    // Increase before broadcast if unordered
                 Console.WriteLine($"New Clock: {this.commLogic.clock}");
                 BroadcastChange();
                 returnValue = true;
@@ -83,9 +96,51 @@ namespace VectorClock.Node
                 Console.WriteLine("Decrease command received!");
                 commLogic.appLogic.DecreaseBalance(msg.controlBlock.BalanceDelta);
                 Console.WriteLine($"New balance: {commLogic.appLogic.balance}");
-                commLogic.IncreaseVectorClock();
+                commLogic.IncreaseVectorClock();                                    // Increase before broadcast if unordered
                 Console.WriteLine($"New Clock: {this.commLogic.clock}");
                 BroadcastChange();
+                returnValue = true;
+            }
+            else if (msg.controlBlock.Command == ControlCommand.Echo)
+            {
+                Console.WriteLine("Echo command received!");
+                returnValue = true;
+            }
+
+            return returnValue;
+        }
+
+        private bool HandleControlMessageOrdered(ref Message msg)
+        {
+            bool returnValue = false;
+
+           
+            if (msg.controlBlock.Command == ControlCommand.SetBalance)
+            {
+                Console.WriteLine("Set balance command received!");
+                commLogic.appLogic.balance = msg.controlBlock.BalanceDelta;
+                Console.WriteLine($"New balance: {commLogic.appLogic.balance}");
+                
+                returnValue = true;
+            }
+            else if (msg.controlBlock.Command == ControlCommand.IncreaseBalance)
+            {
+                Console.WriteLine("Increase command received!");
+                commLogic.appLogic.IncreaseBalance(msg.controlBlock.BalanceDelta);
+                Console.WriteLine($"New balance: {commLogic.appLogic.balance}");
+                Console.WriteLine($"New Clock: {this.commLogic.clock}");
+                BroadcastChange();
+                commLogic.IncreaseVectorClock(); // Increase after broadcast if ordered
+                returnValue = true;
+            }
+            else if (msg.controlBlock.Command == ControlCommand.DecreaseBalance)
+            {
+                Console.WriteLine("Decrease command received!");
+                commLogic.appLogic.DecreaseBalance(msg.controlBlock.BalanceDelta);
+                Console.WriteLine($"New balance: {commLogic.appLogic.balance}");
+                Console.WriteLine($"New Clock: {this.commLogic.clock}");
+                BroadcastChange();
+                commLogic.IncreaseVectorClock(); // Increase after broadcast if ordered
                 returnValue = true;
             }
             else if (msg.controlBlock.Command == ControlCommand.Echo)
@@ -111,6 +166,34 @@ namespace VectorClock.Node
             msg.controlBlock.Command = ControlCommand.Updated;
             
             return returnValue;
+        }
+
+        private void HandleCommunicationMessageOrdered(ref Message msg)
+        {
+            Console.WriteLine("Update command received!");
+
+            Console.WriteLine($"    Update: Own clock: {this.commLogic.clock} Other clock: {msg.communicationBlock.clock}");
+            Console.WriteLine($"    Update: Old balance: {this.commLogic.appLogic.balance} New Balance: {msg.communicationBlock.payload.balance}");
+
+            // check if message is suitable
+
+            if(msg.communicationBlock.clock.Compare(this.commLogic.clock) == ComparisonResult.Before)   //  delay until vc(x) <= m.vc(x) for all x
+            {
+                // Todo: Put message in queue
+            }
+            else
+            {
+                // Todo: Check Messages in queue
+
+                this.commLogic.clock.update(msg.communicationBlock.clock);
+                this.commLogic.appLogic.balance = msg.communicationBlock.payload.balance;
+                if (this.commLogic.clock.getID() != msg.communicationBlock.clock.getID())
+                {
+                    this.commLogic.IncreaseVectorClock(msg.communicationBlock.clock.getID());           // update control variable
+                    Console.WriteLine($"    Increased clock[{msg.communicationBlock.clock.getID()}]: {this.commLogic.clock}");
+                }
+            }
+            msg.controlBlock.Command = ControlCommand.Updated;
         }
 
         private void AnswerHost(Message msg)

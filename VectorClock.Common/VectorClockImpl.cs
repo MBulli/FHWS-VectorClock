@@ -36,6 +36,11 @@ namespace VectorClock.Common
             timestamps[this.id]++;
         }
 
+        public void Increment(int i)
+        {
+            timestamps[i]++;
+        }
+
         public void Set(int index, int value)
         {
             timestamps[index] = value;

@@ -53,7 +53,7 @@ namespace VectorClock.Node
                     byte[] data = client.Receive(ref remoteEP);
 
                     Message msg = MessageDeserializer.Deserialize(data);
-                    controlLogic.HandleMessage(msg, remoteEP);
+                    controlLogic.HandleMessage(true, msg, remoteEP);
                 }
             }
         }

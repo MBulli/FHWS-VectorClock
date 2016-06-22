@@ -27,6 +27,11 @@ namespace VectorClock.Node
             clock.Increment();
         }
 
+        public void IncreaseVectorClock(int i)
+        {
+            clock.Increment(i);
+        }
+
         public void UpdateClock(VectorClockImpl newerClock)
         {
             for(int i = 0; i < newerClock.Length; i++)
