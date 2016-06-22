@@ -1,0 +1,12 @@
+{
+  "DataCollection": [
+    {
+      "Id": "bd7cf15a-0796-4c91-b96f-9298bd32f276",
+      "Command": "0 1337"
+    },
+    {
+      "Id": "5be2a2a9-1a5b-497f-a08f-2dd37ce4c58d",
+      "Command": "1 1338"
+    }
+  ]
+}
