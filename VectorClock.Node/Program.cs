@@ -43,6 +43,7 @@ namespace VectorClock.Node
 
             Console.WriteLine($"Node with Id {hostID} and IP-address {Dns.GetHostName().ToString()} started properly.");
             Console.WriteLine($"Listening to UDP-Port: {port}");
+            Console.WriteLine("------------- Start listening to messages -------------");
 
             using (UdpClient client = new UdpClient(port, AddressFamily.InterNetwork))
             {

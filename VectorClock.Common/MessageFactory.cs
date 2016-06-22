@@ -24,29 +24,6 @@ namespace VectorClock.Common
                 msg.senderAddress = senderAdress;
                 return msg;
             }
-
-            public static Message CreateCausalBroadcastMessage(IPEndPoint senderAddress, decimal balance, VectorClockImpl clock, int broadcastID)
-            {
-                Message msg = new Message();
-                msg.type = MessageType.Communication;
-                msg.controlBlock.Command = ControlCommand.AnswerToBroadcast;
-                msg.communicationBlock.clock = clock;
-                msg.communicationBlock.payload.balance = balance;
-                msg.casualBroadcastID = broadcastID;
-                msg.senderAddress = senderAddress;
-                return msg;
-            }
-
-            public static Message CreateCausalBroadcastAnswerMessage(IPEndPoint senderAddress, int nodeID, int broadcastID)
-            {
-                Message msg = new Message();
-                msg.type = MessageType.Communication;
-                msg.controlBlock.Command = ControlCommand.BroadcastAnswer;
-                msg.communicationBlock.clock = new VectorClockImpl(nodeID);
-                msg.casualBroadcastID = broadcastID;
-                msg.senderAddress = senderAddress;
-                return msg;
-            }
         }
     }
 }
