@@ -13,13 +13,13 @@ namespace VectorClock.Node
     {
         CommunicationLogic commLogic;
         IPEndPoint endPoint;
-        List<Message> delayedMessages;
+        OrderedMessageList delayedMessages;
 
         public ControlLogic(CommunicationLogic commLogic, IPEndPoint endPoint)
         {
             this.commLogic = commLogic;
             this.endPoint = endPoint;
-            this.delayedMessages = new List<Message>();
+            this.delayedMessages = new OrderedMessageList();
         }
 
         public bool HandleMessage(bool causallyOrdered, Message msg, IPEndPoint remoteEP)
@@ -181,7 +181,7 @@ namespace VectorClock.Node
             {
                 if (MessageNotAcceptable(msg))   //  delay until vc(x) <= m.vc(x) for all x
                 {
-                    delayedMessages.Add(msg);   // Put message in queue
+                    delayedMessages.PushItem(msg);   // Put message in queue
                     Console.WriteLine($"    Message {msg.communicationBlock.clock} is to early, delaying...");
                 }
                 else
@@ -190,12 +190,27 @@ namespace VectorClock.Node
             else
             {
                 if(MessageNotAcceptable(msg))
-                    throw new NotImplementedException("More than one delayed messages! Not yet done...");
+                {
+                    for(int i = 0; i < delayedMessages.Count; i ++)
+                    {
+                        Message current = delayedMessages.PopItem();
+                        if(!MessageNotAcceptable(current))
+                        {
+                            delayedMessages.PopItem();
+                            UseMessageOrdered(current);
+                        }
+                    }
+                    if(MessageNotAcceptable(msg))
+                    {
+                        delayedMessages.PushItem(msg);
+                    }
+                }
                 else
                 {
                     UseMessageOrdered(msg);
-                    if (!MessageNotAcceptable(delayedMessages.ElementAt(0)))
-                        UseMessageOrdered(delayedMessages.ElementAt(0));
+                    Message messageToProof = delayedMessages.PopItem();
+                    if (!MessageNotAcceptable(messageToProof))
+                        UseMessageOrdered(messageToProof);
                 }
             }
 
