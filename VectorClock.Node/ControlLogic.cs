@@ -201,9 +201,7 @@ namespace VectorClock.Node
                         }
                     }
                     if(MessageNotAcceptable(msg))
-                    {
                         delayedMessages.PushItem(msg);
-                    }
                 }
                 else
                 {
