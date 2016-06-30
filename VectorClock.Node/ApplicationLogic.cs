@@ -10,14 +10,9 @@ namespace VectorClock.Node
     {
         public decimal balance;
 
-        public void IncreaseBalance(decimal newBalance)
+        public void UpdateBalance(decimal newBalance)
         {
             balance += newBalance;
-        }
-
-        public void DecreaseBalance(decimal newBalance)
-        {
-            balance -= newBalance;
         }
     }
 

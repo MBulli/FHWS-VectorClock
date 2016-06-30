@@ -103,8 +103,8 @@ namespace VectorClock.Commander.ViewModel
             {
                 Message msg = new Message();
                 msg.type = MessageType.ControlCommand;
-                msg.controlBlock.Command = delta < 0 ? ControlCommand.DecreaseBalance : ControlCommand.IncreaseBalance;
-                msg.controlBlock.BalanceDelta = Math.Abs(delta);
+                msg.controlBlock.Command = ControlCommand.UpdateBalance;
+                msg.controlBlock.BalanceDelta = delta;
 
                 BalanceDeltaText = null;
                 await SendMessageAsync(msg);

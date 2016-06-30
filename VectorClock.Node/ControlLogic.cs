@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using VectorClock.Common;
 
@@ -14,12 +15,14 @@ namespace VectorClock.Node
         CommunicationLogic commLogic;
         IPEndPoint endPoint;
         OrderedMessageList delayedMessages;
+        Random random;
 
         public ControlLogic(CommunicationLogic commLogic, IPEndPoint endPoint)
         {
             this.commLogic = commLogic;
             this.endPoint = endPoint;
             this.delayedMessages = new OrderedMessageList();
+            random = new Random();
         }
 
         public bool HandleMessage(bool causallyOrdered, Message msg, IPEndPoint remoteEP)
@@ -81,24 +84,14 @@ namespace VectorClock.Node
                 commLogic.IncreaseVectorClock();
                 returnValue = true;
             }
-            else if (msg.controlBlock.Command == ControlCommand.IncreaseBalance)
+            else if (msg.controlBlock.Command == ControlCommand.UpdateBalance)
             {
                 Console.WriteLine("Increase command received!");
-                commLogic.appLogic.IncreaseBalance(msg.controlBlock.BalanceDelta);
+                commLogic.appLogic.UpdateBalance(msg.controlBlock.BalanceDelta);
                 Console.WriteLine($"New balance: {commLogic.appLogic.balance}");
                 commLogic.IncreaseVectorClock();                                    // Increase before broadcast if unordered
                 Console.WriteLine($"New Clock: {this.commLogic.clock}");
-                BroadcastChange();
-                returnValue = true;
-            }
-            else if (msg.controlBlock.Command == ControlCommand.DecreaseBalance)
-            {
-                Console.WriteLine("Decrease command received!");
-                commLogic.appLogic.DecreaseBalance(msg.controlBlock.BalanceDelta);
-                Console.WriteLine($"New balance: {commLogic.appLogic.balance}");
-                commLogic.IncreaseVectorClock();                                    // Increase before broadcast if unordered
-                Console.WriteLine($"New Clock: {this.commLogic.clock}");
-                BroadcastChange();
+                BroadcastChange(msg);
                 returnValue = true;
             }
             else if (msg.controlBlock.Command == ControlCommand.Echo)
@@ -123,22 +116,12 @@ namespace VectorClock.Node
                 
                 returnValue = true;
             }
-            else if (msg.controlBlock.Command == ControlCommand.IncreaseBalance)
+            else if (msg.controlBlock.Command == ControlCommand.UpdateBalance)
             {
                 Console.WriteLine("Increase command received!");
-                commLogic.appLogic.IncreaseBalance(msg.controlBlock.BalanceDelta);
+                commLogic.appLogic.UpdateBalance(msg.controlBlock.BalanceDelta);
                 Console.WriteLine($"New balance: {commLogic.appLogic.balance}");
-                BroadcastChange();
-                commLogic.IncreaseVectorClock(); // Increase after broadcast if ordered
-                Console.WriteLine($"New Clock: {this.commLogic.clock}");
-                returnValue = true;
-            }
-            else if (msg.controlBlock.Command == ControlCommand.DecreaseBalance)
-            {
-                Console.WriteLine("Decrease command received!");
-                commLogic.appLogic.DecreaseBalance(msg.controlBlock.BalanceDelta);
-                Console.WriteLine($"New balance: {commLogic.appLogic.balance}");
-                BroadcastChange();
+                BroadcastChange(msg);
                 commLogic.IncreaseVectorClock(); // Increase after broadcast if ordered
                 Console.WriteLine($"New Clock: {this.commLogic.clock}");
                 returnValue = true;
@@ -160,7 +143,7 @@ namespace VectorClock.Node
             Console.WriteLine($"    Update: Old balance: {this.commLogic.appLogic.balance} New Balance: {msg.communicationBlock.payload.balance}");
 
             this.commLogic.clock.update(msg.communicationBlock.clock);
-            this.commLogic.appLogic.balance = msg.communicationBlock.payload.balance;
+            this.commLogic.appLogic.balance += msg.communicationBlock.payload.balance;
             this.commLogic.IncreaseVectorClock();
             Console.WriteLine($"    Increased own clock: {this.commLogic.clock}");
             msg.controlBlock.Command = ControlCommand.Updated;
@@ -179,7 +162,7 @@ namespace VectorClock.Node
 
             if (delayedMessages.Count == 0) // no delayed messages
             {
-                if (MessageNotAcceptable(msg))   //  delay until vc(x) <= m.vc(x) for all x
+                if (!MessageAcceptable(msg))   //  delay until vc(x) <= m.vc(x) for all x
                 {
                     delayedMessages.PushItem(msg);   // Put message in queue
                     Console.WriteLine($"    Message {msg.communicationBlock.clock} is to early, delaying...");
@@ -189,26 +172,32 @@ namespace VectorClock.Node
             }
             else
             {
-                if(MessageNotAcceptable(msg))
+                if(!MessageAcceptable(msg))
                 {
                     for(int i = 0; i < delayedMessages.Count; i ++)
                     {
                         Message current = delayedMessages.PopItem();
-                        if(!MessageNotAcceptable(current))
+                        if (MessageAcceptable(current))
                         {
-                            delayedMessages.PopItem();
                             UseMessageOrdered(current);
                         }
+                        else
+                            delayedMessages.PushItem(current);
                     }
-                    if(MessageNotAcceptable(msg))
+                    if (!MessageAcceptable(msg))
                         delayedMessages.PushItem(msg);
+                    else
+                        UseMessageOrdered(msg);
                 }
                 else
                 {
                     UseMessageOrdered(msg);
-                    Message messageToProof = delayedMessages.PopItem();
-                    if (!MessageNotAcceptable(messageToProof))
-                        UseMessageOrdered(messageToProof);
+                    for (int i = 0; i < delayedMessages.Count; i++)
+                    {
+                        Message messageToProof = delayedMessages.PopItem();
+                        if (MessageAcceptable(messageToProof))
+                            UseMessageOrdered(messageToProof);
+                    }
                 }
             }
 
@@ -218,8 +207,9 @@ namespace VectorClock.Node
         private void UseMessageOrdered(Message msg)
         {
             Console.WriteLine($"    Message {msg.communicationBlock.clock} is ok! Using it.");
-            this.commLogic.clock.update(msg.communicationBlock.clock);
-            this.commLogic.appLogic.balance = msg.communicationBlock.payload.balance;
+            
+            //this.commLogic.clock.update(msg.communicationBlock.clock);
+            this.commLogic.appLogic.balance += msg.communicationBlock.payload.balance;
             if (this.commLogic.clock.getID() != msg.communicationBlock.clock.getID())
             {
                 this.commLogic.IncreaseVectorClock(msg.communicationBlock.clock.getID());           // update control variable
@@ -227,9 +217,10 @@ namespace VectorClock.Node
             }
         }
 
-        private bool MessageNotAcceptable(Message msg)
+        private bool MessageAcceptable(Message msg)
         {
-            return (msg.communicationBlock.clock.Compare(this.commLogic.clock) == ComparisonResult.After);
+            return (msg.communicationBlock.clock.Compare(this.commLogic.clock) == ComparisonResult.Equal
+                    ||  msg.communicationBlock.clock.Compare(this.commLogic.clock) == ComparisonResult.Before);
         }
 
         private void AnswerHost(Message msg)
@@ -237,9 +228,10 @@ namespace VectorClock.Node
             SendMessageTo("HostAnswer", msg, new IPEndPoint(IPAddress.Loopback, 1340));
         }
 
-        private void BroadcastChange()
+        private void BroadcastChange(Message handledMessage)
         {
-            var msg = MessageFactory.Communication.CreateUpdateMessage(this.endPoint, this.commLogic.appLogic.balance, this.commLogic.clock);
+            //var msg = MessageFactory.Communication.CreateUpdateMessage(this.endPoint, this.commLogic.appLogic.balance, this.commLogic.clock); // User this for absolute values
+            var msg = MessageFactory.Communication.CreateUpdateMessage(this.endPoint, handledMessage.controlBlock.BalanceDelta , this.commLogic.clock);
 
             var endpoints = new IPEndPoint[] {
                 new IPEndPoint(IPAddress.Loopback, 1337),
@@ -247,9 +239,22 @@ namespace VectorClock.Node
                 new IPEndPoint(IPAddress.Loopback, 1339)
             };
 
+            int i = 1;
             foreach (var node in endpoints.Where(ep => !ep.Equals(endPoint)))
             {
-                SendMessageTo("Broadcast", msg, node);
+                if (i == 2)
+                {
+                    int delayInMilliseconds = random.Next(100, 2000);
+                    Console.WriteLine($"Delaying broadcast to node {i} by {delayInMilliseconds} milliseconds.");
+                    Thread.Sleep(delayInMilliseconds);
+
+                    SendMessageTo("Broadcast", msg, node);
+                }
+                else
+                {
+                    SendMessageTo("Broadcast", msg, node);
+                }
+                i++;
             }
         }
 

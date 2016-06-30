@@ -108,7 +108,7 @@ namespace VectorClock.Commander.ViewModel
                     {
                         Message msg = new Message();
 
-                        msg.controlBlock.Command = ControlCommand.IncreaseBalance;
+                        msg.controlBlock.Command = ControlCommand.UpdateBalance;
                         msg.communicationBlock.payload.balance = 10;
 
                         await Task.WhenAll(
