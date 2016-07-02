@@ -19,6 +19,12 @@ namespace VectorClock.Common
             this.id = ownerIndex;
         }
 
+        public VectorClockImpl(VectorClockImpl input)
+        {
+            this.timestamps = input.timestamps;
+            this.id = input.id;
+        }
+
         public int Length { get { return timestamps.Length; } }
         public int this[int index]
         {

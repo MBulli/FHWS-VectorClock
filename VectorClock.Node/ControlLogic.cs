@@ -27,11 +27,12 @@ namespace VectorClock.Node
 
         public bool HandleMessage(bool causallyOrdered, Message msg, IPEndPoint remoteEP)
         {
+            Console.WriteLine("-------------------------------------");
             bool returnValue = false;
 
-            if(msg.type == MessageType.ControlCommand)
+            if (msg.type == MessageType.ControlCommand)
             {
-                if(causallyOrdered)
+                if (causallyOrdered)
                 {
                     HandleControlMessageOrdered(ref msg);
                 }
@@ -41,8 +42,8 @@ namespace VectorClock.Node
                 }
             }
             else
-            { 
-                if(causallyOrdered)
+            {
+                if (causallyOrdered)
                 {
                     HandleCommunicationMessageOrdered(ref msg);
                 }
@@ -53,9 +54,9 @@ namespace VectorClock.Node
             }
 
             // Answer host
-            msg.communicationBlock.clock = this.commLogic.clock;
-            msg.communicationBlock.payload.balance = this.commLogic.appLogic.balance;
-            AnswerHost(msg);
+            Message hostAnswer = new Message(msg);
+            hostAnswer.communicationBlock.clock = new VectorClockImpl(this.commLogic.clock.getID());
+            AnswerHost(hostAnswer);
 
             return returnValue;
         }
@@ -107,13 +108,13 @@ namespace VectorClock.Node
         {
             bool returnValue = false;
 
-           
+
             if (msg.controlBlock.Command == ControlCommand.SetBalance)
             {
                 Console.WriteLine("Set balance command received!");
                 commLogic.appLogic.balance = msg.controlBlock.BalanceDelta;
                 Console.WriteLine($"New balance: {commLogic.appLogic.balance}");
-                
+
                 returnValue = true;
             }
             else if (msg.controlBlock.Command == ControlCommand.UpdateBalance)
@@ -147,7 +148,7 @@ namespace VectorClock.Node
             this.commLogic.IncreaseVectorClock();
             Console.WriteLine($"    Increased own clock: {this.commLogic.clock}");
             msg.controlBlock.Command = ControlCommand.Updated;
-            
+
             return returnValue;
         }
 
@@ -172,9 +173,9 @@ namespace VectorClock.Node
             }
             else
             {
-                if(!MessageAcceptable(msg))
+                if (!MessageAcceptable(msg))
                 {
-                    for(int i = 0; i < delayedMessages.Count; i ++)
+                    for (int i = 0; i < delayedMessages.Count; i++)
                     {
                         Message current = delayedMessages.PopItem();
                         if (MessageAcceptable(current))
@@ -207,20 +208,23 @@ namespace VectorClock.Node
         private void UseMessageOrdered(Message msg)
         {
             Console.WriteLine($"    Message {msg.communicationBlock.clock} is ok! Using it.");
-            
+
             //this.commLogic.clock.update(msg.communicationBlock.clock);
             this.commLogic.appLogic.balance += msg.communicationBlock.payload.balance;
+            Console.WriteLine($" Balance in Msg: {msg.communicationBlock.payload.balance}");
             if (this.commLogic.clock.getID() != msg.communicationBlock.clock.getID())
             {
                 this.commLogic.IncreaseVectorClock(msg.communicationBlock.clock.getID());           // update control variable
                 Console.WriteLine($"    Increased clock[{msg.communicationBlock.clock.getID()}]: {this.commLogic.clock}");
             }
+
+            PrintCurrentValues();
         }
 
         private bool MessageAcceptable(Message msg)
         {
             return (msg.communicationBlock.clock.Compare(this.commLogic.clock) == ComparisonResult.Equal
-                    ||  msg.communicationBlock.clock.Compare(this.commLogic.clock) == ComparisonResult.Before);
+                    || msg.communicationBlock.clock.Compare(this.commLogic.clock) == ComparisonResult.Before);
         }
 
         private void AnswerHost(Message msg)
@@ -231,7 +235,7 @@ namespace VectorClock.Node
         private void BroadcastChange(Message handledMessage)
         {
             //var msg = MessageFactory.Communication.CreateUpdateMessage(this.endPoint, this.commLogic.appLogic.balance, this.commLogic.clock); // User this for absolute values
-            var msg = MessageFactory.Communication.CreateUpdateMessage(this.endPoint, handledMessage.controlBlock.BalanceDelta , this.commLogic.clock);
+            var msg = MessageFactory.Communication.CreateUpdateMessage(this.endPoint, handledMessage.controlBlock.BalanceDelta, this.commLogic.clock);
 
             var endpoints = new IPEndPoint[] {
                 new IPEndPoint(IPAddress.Loopback, 1337),
@@ -260,7 +264,7 @@ namespace VectorClock.Node
 
         private void SendMessageTo(String messageText, Message msg, IPEndPoint node)
         {
-            if(this.endPoint.Equals(node))
+            if (this.endPoint.Equals(node))
             {
                 throw new InvalidOperationException("Sendmessage: Endpoints are equal!");
             }
@@ -273,6 +277,13 @@ namespace VectorClock.Node
 
                 Console.WriteLine($"Message ({messageText}) sent to {node}");
             }
+        }
+        private void PrintCurrentValues()
+        {
+            // Write all new infos after message use
+            Console.WriteLine("New Values:");
+            Console.WriteLine($"     Clock: {this.commLogic.clock}");
+            Console.WriteLine($"     Balance: {this.commLogic.appLogic.balance}");
         }
     }
 }
