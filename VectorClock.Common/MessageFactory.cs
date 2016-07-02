@@ -11,6 +11,15 @@ namespace VectorClock.Common
     {
         public static class Control
         {
+            public static Message CreateUpdateControlMessage(decimal balanceDelta)
+            {
+                Message msg = new Message();
+                msg.type = MessageType.ControlCommand;
+                msg.controlBlock.Command = ControlCommand.UpdateBalance;
+                msg.controlBlock.BalanceDelta = balanceDelta;
+
+                return msg;
+            }
         }
 
         public static class Communication

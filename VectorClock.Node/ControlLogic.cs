@@ -55,7 +55,8 @@ namespace VectorClock.Node
 
             // Answer host
             Message hostAnswer = new Message(msg);
-            hostAnswer.communicationBlock.clock = new VectorClockImpl(this.commLogic.clock.getID());
+            hostAnswer.communicationBlock.clock = new VectorClockImpl(this.commLogic.clock);
+            hostAnswer.communicationBlock.payload.balance = this.commLogic.appLogic.balance;
             AnswerHost(hostAnswer);
 
             return returnValue;
@@ -248,16 +249,17 @@ namespace VectorClock.Node
             {
                 if (i == 2)
                 {
-                    int delayInMilliseconds = random.Next(100, 2000);
+                    int delayInMilliseconds = random.Next(100, 1000);
                     Console.WriteLine($"Delaying broadcast to node {i} by {delayInMilliseconds} milliseconds.");
                     Thread.Sleep(delayInMilliseconds);
-
+                
                     SendMessageTo("Broadcast", msg, node);
                 }
                 else
                 {
                     SendMessageTo("Broadcast", msg, node);
                 }
+                //SendMessageTo("Broadcast", msg, node);
                 i++;
             }
         }

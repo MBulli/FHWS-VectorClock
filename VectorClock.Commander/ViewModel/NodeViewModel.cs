@@ -101,13 +101,9 @@ namespace VectorClock.Commander.ViewModel
 
             if (decimal.TryParse(BalanceDeltaText, out delta))
             {
-                Message msg = new Message();
-                msg.type = MessageType.ControlCommand;
-                msg.controlBlock.Command = ControlCommand.UpdateBalance;
-                msg.controlBlock.BalanceDelta = delta;
-
+                
                 BalanceDeltaText = null;
-                await SendMessageAsync(msg);
+                await SendMessageAsync(MessageFactory.Control.CreateUpdateControlMessage(delta));
             }
         }
     }

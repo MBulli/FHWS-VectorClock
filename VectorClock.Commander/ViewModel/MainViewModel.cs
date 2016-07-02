@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -16,6 +17,7 @@ namespace VectorClock.Commander.ViewModel
 {
     public class MainViewModel : PropertyChangedBase
     {
+        private Random random = new Random();
         private string title = "VectorClock";
         public string Title
         {
@@ -106,22 +108,28 @@ namespace VectorClock.Commander.ViewModel
                 {
                     testCommand = new RelayCommand(async () =>
                     {
-                        Message msg = new Message();
+                        for (int i = 0; i < 100; i++)
+                        {
+                            int delta = random.Next(1, 100);
+                            Message msg = MessageFactory.Control.CreateUpdateControlMessage(delta);
 
-                        msg.controlBlock.Command = ControlCommand.UpdateBalance;
-                        msg.communicationBlock.payload.balance = 10;
+                            int node = random.Next(1, 4);
 
-                        await Task.WhenAll(
-                                        Node1.SendMessageAsync(msg),
-                                        Node2.SendMessageAsync(msg),
-                                        Node3.SendMessageAsync(msg));
+                            switch (node)
+                            {
+                                case 1:
+                                    await Node1.SendMessageAsync(msg);
+                                    break;
+                                case 2:
+                                    await Node2.SendMessageAsync(msg);
+                                    break;
+                                case 3:
+                                    await Node3.SendMessageAsync(msg);
+                                    break;
+                            }
 
-                        Message msg2 = new Message();
-
-                        msg2.controlBlock.Command = ControlCommand.SendMessageTo;
-                        msg2.controlBlock.SendMessageTarget = Node2.IpEndpoint;
-
-                        await Node1.SendMessageAsync(msg2);
+                            Thread.Sleep(20);
+                        }
                     });
                 }
                 return testCommand;
