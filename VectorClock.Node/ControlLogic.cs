@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -184,7 +185,11 @@ namespace VectorClock.Node
                             UseMessageOrdered(current);
                         }
                         else
+                        {
                             delayedMessages.PushItem(current);
+                            Debug.WriteLine("Multiple messages delayed!!!");
+                        }
+
                     }
                     if (!MessageAcceptable(msg))
                         delayedMessages.PushItem(msg);

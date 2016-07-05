@@ -108,7 +108,7 @@ namespace VectorClock.Commander.ViewModel
                 {
                     testCommand = new RelayCommand(async () =>
                     {
-                        for (int i = 0; i < 100; i++)
+                        for (int i = 0; i < 10; i++)
                         {
                             int delta = random.Next(1, 100);
                             Message msg = MessageFactory.Control.CreateUpdateControlMessage(delta);
@@ -128,7 +128,7 @@ namespace VectorClock.Commander.ViewModel
                                     break;
                             }
 
-                            Thread.Sleep(20);
+                            Thread.Sleep(100);
                         }
                     });
                 }
