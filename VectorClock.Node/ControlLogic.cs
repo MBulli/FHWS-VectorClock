@@ -156,6 +156,8 @@ namespace VectorClock.Node
 
         private void HandleCommunicationMessageOrdered(ref Message msg)
         {
+            bool allreadyPushed = false;
+
             Console.WriteLine("Update command received!");
 
             Console.WriteLine($"    Update: Own clock: {this.commLogic.clock} Other clock: {msg.communicationBlock.clock}");
@@ -183,28 +185,40 @@ namespace VectorClock.Node
                         if (MessageAcceptable(current))
                         {
                             UseMessageOrdered(current);
+                            if (!MessageAcceptable(msg))
+                            {
+                                delayedMessages.PushItem(msg);
+                                allreadyPushed = true;
+                                Debug.WriteLine("Multiple messages delayed!!!");
+                                Console.WriteLine("Multiple messages delayed!!!");
+                                break;
+                            }
+                            else
+                            {
+                                UseMessageOrdered(msg);
+                                allreadyPushed = true;
+                                TestDelayedMessages();
+                                break;
+                            }
                         }
                         else
                         {
                             delayedMessages.PushItem(current);
-                            Debug.WriteLine("Multiple messages delayed!!!");
+                            Debug.WriteLine("Reinserted delayed Message!");
+                            Console.WriteLine("Reinserted delayed Message!");
                         }
-
                     }
-                    if (!MessageAcceptable(msg))
+
+                    if (!allreadyPushed)
+                    {
+                        // Nothing matched, just push msg in delayed list
                         delayedMessages.PushItem(msg);
-                    else
-                        UseMessageOrdered(msg);
+                    }
                 }
                 else
                 {
                     UseMessageOrdered(msg);
-                    for (int i = 0; i < delayedMessages.Count; i++)
-                    {
-                        Message messageToProof = delayedMessages.PopItem();
-                        if (MessageAcceptable(messageToProof))
-                            UseMessageOrdered(messageToProof);
-                    }
+                    TestDelayedMessages();
                 }
             }
 
@@ -225,6 +239,18 @@ namespace VectorClock.Node
             }
 
             PrintCurrentValues();
+        }
+
+        private void TestDelayedMessages()
+        {
+            for (int i = 0; i < delayedMessages.Count; i++)
+            {
+                Message messageToProof = delayedMessages.PopItem();
+                if (MessageAcceptable(messageToProof))
+                    UseMessageOrdered(messageToProof);
+                else
+                    delayedMessages.PushItem(messageToProof);
+            }
         }
 
         private bool MessageAcceptable(Message msg)
