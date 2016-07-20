@@ -17,7 +17,7 @@ namespace VectorClock.Commander.ViewModel
 {
     public class MainViewModel : PropertyChangedBase
     {
-        private Random random = new Random();
+        private Random random = new Random(0);
         private string title = "VectorClock";
         public string Title
         {

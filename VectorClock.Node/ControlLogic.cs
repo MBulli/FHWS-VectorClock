@@ -23,7 +23,7 @@ namespace VectorClock.Node
             this.commLogic = commLogic;
             this.endPoint = endPoint;
             this.delayedMessages = new OrderedMessageList();
-            random = new Random();
+            random = new Random(0);
         }
 
         public bool HandleMessage(bool causallyOrdered, Message msg, IPEndPoint remoteEP)

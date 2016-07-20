@@ -59,20 +59,21 @@ namespace VectorClock.Common
 
         public ComparisonResult Compare(VectorClockImpl other)
         {
-            if(IsEqual(this.timestamps, other.timestamps))
-            {
-                return ComparisonResult.Equal;
-            }
-            else if(IsConcurrent(this.timestamps, other.timestamps))
+            bool a = other[this.id] < this[id];
+            bool b = this[other.id] < other[other.id];
+
+            if (a && b)
             {
                 return ComparisonResult.Concurrent;
             }
-            else if(LessThanOrEqual(this.timestamps, other.timestamps))
+            else if (a)
             {
-                return ComparisonResult.Before;
+                return ComparisonResult.After;
             }
-
-            return ComparisonResult.After;
+            else
+            {
+                return ComparisonResult.Before; // or Equal
+            }
         }
 
         private bool LessThanOrEqual(int[] a, int[] b)
