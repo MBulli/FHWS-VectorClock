@@ -230,7 +230,7 @@ namespace VectorClock.Node
             Console.WriteLine($"    Message {msg.communicationBlock.clock} is ok! Using it.");
 
             //this.commLogic.clock.update(msg.communicationBlock.clock);
-            this.commLogic.appLogic.balance += msg.communicationBlock.payload.balance;
+            this.commLogic.appLogic.UpdateBalance(msg.communicationBlock.payload.balance);
             Console.WriteLine($" Balance in Msg: {msg.communicationBlock.payload.balance}");
             if (this.commLogic.clock.getID() != msg.communicationBlock.clock.getID())
             {
