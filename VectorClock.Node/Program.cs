@@ -14,41 +14,35 @@ namespace VectorClock.Node
     {
         static void Main(string[] args)
         {
-            if (args.Length != 2)
+            if (args.Length != 1)
             {
-                Console.WriteLine("Invalid parameter.\nUsage: {0} <hostID> <port>",
+                Console.WriteLine("Invalid parameter.\nUsage: {0} <hostID>",
                         System.IO.Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().Location));
                 return;
             }
 
             int hostID = 0;
-            int port = 0;
 
             if (!int.TryParse(args[0], out hostID))
             {
                 Console.WriteLine("FATAL: Failed to parse hostID commandline parameter.");
                 return;
             }
-            if (!int.TryParse(args[1], out port))
-            {
-                Console.WriteLine("FATAL: Failed to parse port commandline parameter.");
-                return;
-            }
 
-            IPEndPoint endPoint = new IPEndPoint(IPAddress.Loopback, port);
+            IPEndPoint localEndpoint = NetworkConfig.NodeEndpoints[hostID];
 
             ApplicationLogic appLogic = new ApplicationLogic();
             CommunicationLogic commLogic = new CommunicationLogic(appLogic, hostID);
-            ControlLogic controlLogic = new ControlLogic(commLogic, endPoint);
+            ControlLogic controlLogic = new ControlLogic(commLogic, localEndpoint);
 
             Console.WriteLine($"Node with Id {hostID} and IP-address {Dns.GetHostName().ToString()} started properly.");
-            Console.WriteLine($"Listening to UDP-Port: {port}");
+            Console.WriteLine($"Listening to UDP-Port: {localEndpoint.Port}");
             var causallyOrderedMode = true;
             var modeString = causallyOrderedMode ? "Causally ordered" : "Not causally ordered";
             Console.WriteLine($"Mode: {modeString}");
             Console.WriteLine("------------- Start listening to messages -------------");
 
-            using (UdpClient client = new UdpClient(port, AddressFamily.InterNetwork))
+            using (UdpClient client = new UdpClient(localEndpoint.Port, AddressFamily.InterNetwork))
             {
                 while (true)
                 {

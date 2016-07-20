@@ -24,13 +24,13 @@ namespace VectorClock.Common
 
         public static class Communication
         {
-            public static Message CreateUpdateMessage(IPEndPoint senderAdress, decimal balance, VectorClockImpl clock)
+            public static Message CreateUpdateMessage(decimal balance, VectorClockImpl clock)
             {
                 Message msg = new Message();
                 msg.type = MessageType.Communication;
                 msg.communicationBlock.clock = clock;
                 msg.communicationBlock.payload.balance = balance;
-                msg.senderAddress = senderAdress;
+
                 return msg;
             }
         }

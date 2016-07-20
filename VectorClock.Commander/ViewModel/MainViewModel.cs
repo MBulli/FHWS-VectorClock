@@ -41,16 +41,9 @@ namespace VectorClock.Commander.ViewModel
 
         public MainViewModel()
         {
-            //Node1 = new NodeViewModel("mjverteil01", System.Net.IPAddress.Parse("10.10.29.21"));
-            //Node2 = new NodeViewModel("mjverteil02", System.Net.IPAddress.Parse("10.10.29.142"));
-            //Node3 = new NodeViewModel("mjverteil03", System.Net.IPAddress.Parse("10.10.29.67"));
-
-            // this is for one-machine testing only
-            Node1 = new NodeViewModel("mjverteil01", new IPEndPoint(IPAddress.Loopback, 1337));
-            Node2 = new NodeViewModel("mjverteil02", new IPEndPoint(IPAddress.Loopback, 1338));
-            Node3 = new NodeViewModel("mjverteil03", new IPEndPoint(IPAddress.Loopback, 1339));
-
-            //NodeLokal = new NodeViewModel("lokal", System.Net.IPAddress.Loopback);
+            Node1 = new NodeViewModel("mjverteil01", NetworkConfig.NodeEndpoints[0]);
+            Node2 = new NodeViewModel("mjverteil02", NetworkConfig.NodeEndpoints[1]);
+            Node3 = new NodeViewModel("mjverteil03", NetworkConfig.NodeEndpoints[2]);
 
             CheckNodeConnectivities(); //TODO: Timer
 

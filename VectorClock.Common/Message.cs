@@ -11,7 +11,6 @@ namespace VectorClock.Common
     public class Message
     {
         public MessageType type;
-        public IPEndPoint senderAddress;
         public int casualBroadcastID = 0;
 
         public ControlBlock controlBlock;       

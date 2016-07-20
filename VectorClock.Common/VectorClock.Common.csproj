@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NetworkConfig.cs" />
     <Compile Include="OrderedMessageList.cs" />
     <Compile Include="VectorClockImpl.cs" />
     <Compile Include="Message.cs" />

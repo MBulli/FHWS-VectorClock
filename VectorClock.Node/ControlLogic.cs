@@ -14,14 +14,14 @@ namespace VectorClock.Node
     class ControlLogic
     {
         CommunicationLogic commLogic;
-        IPEndPoint endPoint;
+        IPEndPoint localEndpoint;
         OrderedMessageList delayedMessages;
         Random random;
 
         public ControlLogic(CommunicationLogic commLogic, IPEndPoint endPoint)
         {
             this.commLogic = commLogic;
-            this.endPoint = endPoint;
+            this.localEndpoint = endPoint;
             this.delayedMessages = new OrderedMessageList();
             random = new Random(0);
         }
@@ -58,7 +58,7 @@ namespace VectorClock.Node
             Message hostAnswer = new Message(msg);
             hostAnswer.communicationBlock.clock = new VectorClockImpl(this.commLogic.clock);
             hostAnswer.communicationBlock.payload.balance = this.commLogic.appLogic.balance;
-            AnswerHost(hostAnswer);
+            ReportToCommander(hostAnswer);
 
             return returnValue;
         }
@@ -259,24 +259,20 @@ namespace VectorClock.Node
                     || msg.communicationBlock.clock.Compare(this.commLogic.clock) == ComparisonResult.Before);
         }
 
-        private void AnswerHost(Message msg)
+        private void ReportToCommander(Message msg)
         {
-            SendMessageTo("HostAnswer", msg, new IPEndPoint(IPAddress.Loopback, 1340));
+            SendMessageTo("HostAnswer", msg, NetworkConfig.CommanderEndpoint);
         }
 
         private void BroadcastChange(Message handledMessage)
         {
             //var msg = MessageFactory.Communication.CreateUpdateMessage(this.endPoint, this.commLogic.appLogic.balance, this.commLogic.clock); // User this for absolute values
-            var msg = MessageFactory.Communication.CreateUpdateMessage(this.endPoint, handledMessage.controlBlock.BalanceDelta, this.commLogic.clock);
+            var msg = MessageFactory.Communication.CreateUpdateMessage(handledMessage.controlBlock.BalanceDelta, this.commLogic.clock);
 
-            var endpoints = new IPEndPoint[] {
-                new IPEndPoint(IPAddress.Loopback, 1337),
-                new IPEndPoint(IPAddress.Loopback, 1338),
-                new IPEndPoint(IPAddress.Loopback, 1339)
-            };
+            var endpoints = NetworkConfig.NodeEndpoints;
 
             int i = 1;
-            foreach (var node in endpoints.Where(ep => !ep.Equals(endPoint)))
+            foreach (var node in endpoints.Where(ep => !ep.Equals(localEndpoint)))
             {
                 if (i == 2)
                 {
@@ -297,7 +293,7 @@ namespace VectorClock.Node
 
         private void SendMessageTo(String messageText, Message msg, IPEndPoint node)
         {
-            if (this.endPoint.Equals(node))
+            if (this.localEndpoint.Equals(node))
             {
                 throw new InvalidOperationException("Sendmessage: Endpoints are equal!");
             }
