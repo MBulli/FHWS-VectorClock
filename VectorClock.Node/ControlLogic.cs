@@ -146,7 +146,7 @@ namespace VectorClock.Node
             Console.WriteLine($"    Update: Old balance: {this.commLogic.appLogic.balance} New Balance: {msg.communicationBlock.payload.balance}");
 
             this.commLogic.clock.update(msg.communicationBlock.clock);
-            this.commLogic.appLogic.balance += msg.communicationBlock.payload.balance;
+            this.commLogic.appLogic.UpdateBalance(msg.communicationBlock.payload.balance);
             this.commLogic.IncreaseVectorClock();
             Console.WriteLine($"    Increased own clock: {this.commLogic.clock}");
             msg.controlBlock.Command = ControlCommand.Updated;
